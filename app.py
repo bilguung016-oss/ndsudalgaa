@@ -11,7 +11,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-ADMIN_PASSWORD = "admin123"
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
 
 
 class Survey(db.Model):
@@ -265,7 +265,8 @@ def survey_results(survey_id):
     return render_template('results.html', survey=survey, results=results, total=total_responses)
 
 
+with app.app_context():
+    db.create_all()
+
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=True, port=5001)
