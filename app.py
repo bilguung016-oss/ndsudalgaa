@@ -177,6 +177,30 @@ def add_question(survey_id):
     return jsonify({'id': q.id, 'text': q.text, 'type': q.question_type})
 
 
+@app.route('/admin/question/<int:question_id>/update', methods=['POST'])
+@admin_required
+def update_question(question_id):
+    q = Question.query.get_or_404(question_id)
+    data = request.get_json()
+    q.text = data['text']
+    q.question_type = data.get('type', q.question_type)
+    if data.get('options') is not None:
+        q.options = json.dumps(data['options']) if data['options'] else None
+    db.session.commit()
+    return jsonify({'ok': True})
+
+
+@app.route('/admin/survey/<int:survey_id>/update', methods=['POST'])
+@admin_required
+def update_survey(survey_id):
+    survey = Survey.query.get_or_404(survey_id)
+    data = request.get_json()
+    survey.title = data.get('title', survey.title)
+    survey.description = data.get('description', survey.description)
+    db.session.commit()
+    return jsonify({'ok': True})
+
+
 @app.route('/admin/question/<int:question_id>/delete', methods=['POST'])
 @admin_required
 def delete_question(question_id):
