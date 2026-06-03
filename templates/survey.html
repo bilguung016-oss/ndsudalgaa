@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}{{ survey.title }}{% endblock %}
+{% block head %}
+<style>
+  .gf-question { position: relative; }
+  .gf-question.answered { border-left-color: #673ab7; }
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="gf-header-card">
+  <h1>{{ survey.title }}</h1>
+  {% if survey.description %}
+  <p class="desc">{{ survey.description }}</p>
+  {% endif %}
+  <div class="gf-divider"></div>
+  <p class="required-note">* Заавал бөглөх</p>
+</div>
+
+<form method="POST" id="surveyForm">
+  {% for q in questions %}
+  <div class="gf-question" id="qcard_{{ q.id }}">
+    <label class="gf-label">
+      {{ q.text }}
+      {% if q.question_type != 'text' %}<span class="gf-required">*</span>{% endif %}
+    </label>
+
+    {% if q.question_type == 'single' %}
+      <div style="display:flex; flex-direction:column; gap:2px;">
+        {% for opt in q.get_options() %}
+        <label class="gf-option">
+          <input type="radio" name="q_{{ q.id }}" value="{{ opt }}" required onchange="markAnswered('qcard_{{ q.id }}')">
+          <span>{{ opt }}</span>
+        </label>
+        {% endfor %}
+      </div>
+
+    {% elif q.question_type == 'multiple' %}
+      <div style="display:flex; flex-direction:column; gap:2px;">
+        {% for opt in q.get_options() %}
+        <label class="gf-option">
+          <input type="checkbox" name="q_{{ q.id }}" value="{{ opt }}" onchange="markAnswered('qcard_{{ q.id }}')">
+          <span>{{ opt }}</span>
+        </label>
+        {% endfor %}
+      </div>
+
+    {% elif q.question_type == 'rating' %}
+      <div class="star-group">
+        {% for i in [5,4,3,2,1] %}
+        <input type="radio" id="s{{ q.id }}_{{ i }}" name="q_{{ q.id }}" value="{{ i }}" required onchange="markAnswered('qcard_{{ q.id }}')">
+        <label for="s{{ q.id }}_{{ i }}">★</label>
+        {% endfor %}
+      </div>
+      <p class="gf-hint" style="margin-top:10px;">1 = маш муу &nbsp;·&nbsp; 5 = маш сайн</p>
+
+    {% elif q.question_type == 'text' %}
+      <input type="text" class="gf-input" name="q_{{ q.id }}" placeholder="Хариулт" oninput="markAnswered('qcard_{{ q.id }}')">
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  <div class="gf-submit-row">
+    <button type="submit" class="gf-btn gf-btn-primary">Илгээх</button>
+    <button type="reset" class="gf-btn gf-btn-text" onclick="clearAll()">Цэвэрлэх</button>
+  </div>
+</form>
+
+<script>
+function markAnswered(id) {
+  document.getElementById(id)?.classList.add('answered');
+}
+function clearAll() {
+  document.querySelectorAll('.gf-question').forEach(c => c.classList.remove('answered'));
+}
+</script>
+{% endblock %}

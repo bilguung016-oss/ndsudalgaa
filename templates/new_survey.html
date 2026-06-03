@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Шинэ судалгаа{% endblock %}
+{% block topbar_actions %}
+<a href="/admin/dashboard" class="nav-btn">← Буцах</a>
+{% endblock %}
+{% block content %}
+
+<div style="background:#fff; border-radius:8px; border-top:10px solid #673ab7; box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06); padding:32px; margin-bottom:12px;">
+  <h1 style="font-size:1.5rem; font-weight:400; color:#202124; margin-bottom:4px;">Шинэ судалгаа</h1>
+  <p style="font-size:.85rem; color:#5f6368;">Судалгааны үндсэн мэдээллийг оруулна уу</p>
+</div>
+
+<div style="background:#fff; border-radius:8px; box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06); padding:28px;">
+  <form method="POST">
+    <div style="margin-bottom:24px;">
+      <label style="font-size:.85rem; color:#5f6368; display:block; margin-bottom:6px;">Гарчиг <span style="color:#d93025;">*</span></label>
+      <input type="text" name="title" class="gf-input-box" placeholder="Жишээ: Үйлчилгээний чанарын үнэлгээ" required autofocus style="font-size:1.1rem; padding:12px;">
+    </div>
+    <div style="margin-bottom:28px;">
+      <label style="font-size:.85rem; color:#5f6368; display:block; margin-bottom:6px;">Тайлбар</label>
+      <textarea name="description" class="gf-input-box" rows="3" placeholder="Судалгааны зорилго, танилцуулга..." style="resize:vertical;"></textarea>
+    </div>
+    <div style="display:flex; gap:12px;">
+      <button type="submit" class="gf-btn gf-btn-primary">Үргэлжлүүлэх →</button>
+      <a href="/admin/dashboard" class="gf-btn gf-btn-text">Цуцлах</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

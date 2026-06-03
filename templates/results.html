@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Үр дүн — {{ survey.title }}{% endblock %}
+{% block topbar_actions %}
+<a href="/admin/survey/{{ survey.id }}/edit" class="nav-btn">✏️ Засах</a>
+<a href="/admin/dashboard" class="nav-btn">← Буцах</a>
+{% endblock %}
+{% block head %}
+<style>
+  .bar-track { background:#f1f3f4; border-radius:4px; height:24px; overflow:hidden; flex:1; }
+  .bar-fill { height:100%; background:#673ab7; border-radius:4px; transition:width .6s cubic-bezier(.4,0,.2,1); min-width:2px; }
+  .star-track { background:#f1f3f4; border-radius:4px; height:18px; overflow:hidden; flex:1; }
+  .star-fill { height:100%; background:#f59e0b; border-radius:4px; transition:width .6s; }
+  .text-pill { background:#f8f9fa; border:1px solid #e8eaed; border-radius:20px; padding:8px 16px; font-size:.85rem; color:#3c4043; display:inline-block; margin:4px; }
+</style>
+{% endblock %}
+{% block body %}
+<div class="gf-page">
+
+  <!-- Header -->
+  <div style="background:#fff; border-radius:8px; border-top:10px solid #673ab7;
+    box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);
+    padding:24px; margin-bottom:12px;">
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+      <div>
+        <h1 style="font-size:1.6rem; font-weight:400; color:#202124;">{{ survey.title }}</h1>
+        <p style="font-size:.85rem; color:#5f6368; margin-top:4px;">Хариулт цуглуулсан үр дүн</p>
+      </div>
+      <div style="background:#f3e8fd; border-radius:12px; padding:16px 24px; text-align:center;">
+        <div style="font-size:2rem; font-weight:500; color:#673ab7;">{{ total }}</div>
+        <div style="font-size:.78rem; color:#7b1fa2; margin-top:2px;">нийт хариулт</div>
+      </div>
+    </div>
+  </div>
+
+  {% for r in results %}
+  <div style="background:#fff; border-radius:8px;
+    box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);
+    padding:24px; margin-bottom:12px;">
+
+    <div style="font-size:.78rem; color:#80868b; margin-bottom:4px;">Асуулт {{ loop.index }}</div>
+    <h3 style="font-size:1rem; font-weight:500; color:#202124; margin-bottom:20px;">{{ r.question.text }}</h3>
+
+    {% if r.type == 'chart' %}
+      {% set total_ans = r.counts.values()|sum %}
+      {% for opt, cnt in r.counts.items() %}
+      <div style="margin-bottom:14px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+          <span style="font-size:.88rem; color:#3c4043;">{{ opt }}</span>
+          <span style="font-size:.82rem; color:#80868b; margin-left:12px; white-space:nowrap;">
+            {{ cnt }} хариулт
+            {% if total_ans %}&nbsp;({{ (cnt/total_ans*100)|int }}%){% endif %}
+          </span>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="bar-track">
+            <div class="bar-fill" style="width:{{ (cnt/total_ans*100)|int if total_ans else 0 }}%;"></div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      {% if total_ans == 0 %}
+      <p style="color:#80868b; font-size:.9rem;">Хариулт байхгүй</p>
+      {% endif %}
+
+    {% elif r.type == 'rating' %}
+      <div style="display:flex; align-items:center; gap:24px; flex-wrap:wrap; margin-bottom:20px;">
+        <div style="text-align:center;">
+          <div style="font-size:3rem; font-weight:300; color:#202124; line-height:1;">{{ r.avg }}</div>
+          <div style="font-size:1.5rem; color:#f59e0b; letter-spacing:2px; margin:4px 0;">
+            {% for i in range(r.avg|int) %}★{% endfor %}{% if r.avg - r.avg|int >= 0.5 %}☆{% endif %}
+          </div>
+          <div style="font-size:.78rem; color:#80868b;">дундаж / 5 ·  {{ r.count }} хариулт</div>
+        </div>
+        <div style="flex:1; min-width:200px;">
+          {% for star in [5,4,3,2,1] %}
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <span style="font-size:.82rem; color:#80868b; width:18px; text-align:right;">{{ star }}</span>
+            <span style="color:#f59e0b; font-size:.9rem;">★</span>
+            <div class="star-track">
+              <div class="star-fill" style="width:{{ (r.dist[star|string]/r.count*100)|int if r.count else 0 }}%;"></div>
+            </div>
+            <span style="font-size:.82rem; color:#80868b; width:20px;">{{ r.dist[star|string] }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    {% elif r.type == 'text' %}
+      {% if r.texts %}
+      <div>
+        {% for t in r.texts %}
+        <span class="text-pill">{{ t }}</span>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p style="color:#80868b; font-size:.9rem;">Хариулт байхгүй</p>
+      {% endif %}
+    {% endif %}
+
+  </div>
+  {% endfor %}
+
+</div>
+{% endblock %}

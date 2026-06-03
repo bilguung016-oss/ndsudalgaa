@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Судалгаанууд{% endblock %}
+{% block content %}
+
+<div style="margin-bottom: 24px;">
+  <h2 style="font-size: 1rem; font-weight: 500; color: #5f6368; margin-bottom: 16px;">Идэвхтэй судалгаанууд</h2>
+
+  {% if surveys %}
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+    {% for survey in surveys %}
+    <a href="/survey/{{ survey.id }}" style="text-decoration: none; color: inherit;">
+      <div style="background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06); cursor:pointer; transition: box-shadow .2s;" onmouseenter="this.style.boxShadow='0 4px 8px rgba(0,0,0,.15)'" onmouseleave="this.style.boxShadow='0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06)'">
+        <div style="height: 120px; background: linear-gradient(135deg, #673ab7 0%, #9c4dcc 100%); display:flex; align-items:center; justify-content:center;">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <rect x="6" y="4" width="36" height="40" rx="4" fill="rgba(255,255,255,.25)"/>
+            <rect x="12" y="14" width="24" height="3" rx="1.5" fill="white" opacity=".9"/>
+            <rect x="12" y="21" width="24" height="3" rx="1.5" fill="white" opacity=".9"/>
+            <rect x="12" y="28" width="16" height="3" rx="1.5" fill="white" opacity=".9"/>
+          </svg>
+        </div>
+        <div style="padding: 14px 16px;">
+          <div style="font-size: .95rem; font-weight: 500; color: #202124; margin-bottom: 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ survey.title }}</div>
+          {% if survey.description %}
+          <div style="font-size: .8rem; color: #5f6368; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ survey.description }}</div>
+          {% endif %}
+          <div style="font-size: .75rem; color: #80868b; margin-top: 8px;">{{ survey.created_at.strftime('%Y-%m-%d') }}</div>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div style="text-align:center; padding: 80px 24px; background:#fff; border-radius:8px; box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);">
+    <svg width="64" height="64" viewBox="0 0 48 48" fill="none" style="opacity:.3; margin-bottom:16px">
+      <rect x="6" y="4" width="36" height="40" rx="4" fill="#673ab7"/>
+      <rect x="12" y="14" width="24" height="3" rx="1.5" fill="white"/>
+      <rect x="12" y="21" width="24" height="3" rx="1.5" fill="white"/>
+      <rect x="12" y="28" width="16" height="3" rx="1.5" fill="white"/>
+    </svg>
+    <p style="font-size: 1rem; color: #80868b;">Одоогоор идэвхтэй судалгаа байхгүй байна</p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Баярлалаа{% endblock %}
+{% block content %}
+<div style="background:#fff; border-radius:8px; border-top:10px solid #673ab7; box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06); padding:48px 32px; text-align:center;">
+  <div style="width:64px; height:64px; background:#e8f5e9; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px;">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="#2e7d32">
+      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+    </svg>
+  </div>
+  <h2 style="font-size:1.5rem; font-weight:400; color:#202124; margin-bottom:8px;">Хариулт бүртгэгдлээ</h2>
+  <p style="color:#5f6368; font-size:.95rem;">{{ survey.title }}</p>
+  <div style="margin-top:32px;">
+    <a href="/" class="gf-btn gf-btn-outlined">Нүүр хуудас руу буцах</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block title %}{{ survey.title }} — засах{% endblock %}
+{% block topbar_actions %}
+<a href="/survey/{{ survey.id }}" target="_blank" class="nav-btn">👁 Урьдчилан харах</a>
+<a href="/admin/survey/{{ survey.id }}/results" class="nav-btn">📊 Үр дүн</a>
+<a href="/admin/dashboard" class="nav-btn">← Буцах</a>
+{% endblock %}
+{% block head %}
+<style>
+  .q-card {
+    background:#fff; border-radius:8px; padding:20px 24px;
+    box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);
+    margin-bottom:10px; border-left:4px solid transparent;
+    display:flex; align-items:center; gap:12px; transition:box-shadow .15s;
+  }
+  .q-card:hover { box-shadow:0 4px 8px rgba(0,0,0,.12); }
+  .q-num { font-size:.8rem; color:#80868b; min-width:20px; }
+  .q-text { flex:1; font-size:.9rem; color:#202124; }
+  .add-panel {
+    background:#fff; border-radius:8px;
+    box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);
+    margin-top:16px; overflow:hidden;
+  }
+  .add-panel-header {
+    padding:16px 24px; cursor:pointer; display:flex; align-items:center;
+    gap:10px; font-size:.9rem; font-weight:500; color:#673ab7;
+    border-bottom:1px solid transparent; transition:background .15s;
+  }
+  .add-panel-header:hover { background:#f3e8fd; }
+  .add-panel-body { display:none; padding:24px; border-top:1px solid #e8eaed; }
+  .add-panel-body.open { display:block; }
+  .type-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:20px; }
+  .type-opt {
+    border:1.5px solid #e8eaed; border-radius:6px; padding:10px 14px;
+    cursor:pointer; font-size:.85rem; color:#5f6368;
+    display:flex; align-items:center; gap:8px; transition:all .15s;
+  }
+  .type-opt:hover { border-color:#673ab7; color:#673ab7; background:#f3e8fd; }
+  .type-opt.selected { border-color:#673ab7; color:#673ab7; background:#f3e8fd; font-weight:500; }
+  .opt-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .opt-row input { flex:1; }
+  .opt-del { width:32px; height:32px; border-radius:50%; border:none; background:transparent;
+    cursor:pointer; color:#80868b; font-size:1.1rem; display:flex; align-items:center;
+    justify-content:center; transition:background .12s; }
+  .opt-del:hover { background:#fce8e6; color:#d93025; }
+</style>
+{% endblock %}
+{% block body %}
+<div class="gf-page">
+
+  <!-- Header card -->
+  <div style="background:#fff; border-radius:8px; border-top:10px solid #673ab7;
+    box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);
+    padding:24px; margin-bottom:12px;">
+    <div style="font-size:1.6rem; font-weight:400; color:#202124;">{{ survey.title }}</div>
+    {% if survey.description %}
+    <div style="font-size:.9rem; color:#5f6368; margin-top:6px;">{{ survey.description }}</div>
+    {% endif %}
+  </div>
+
+  <!-- Questions list -->
+  <div id="qList">
+    {% if questions %}
+      {% for q in questions %}
+      <div class="q-card" id="qi_{{ q.id }}">
+        <span class="q-num">{{ loop.index }}</span>
+        <span class="q-text">{{ q.text }}</span>
+        <span class="gf-chip {% if q.question_type == 'single' %}gf-chip-purple{% elif q.question_type == 'multiple' %}gf-chip-blue{% elif q.question_type == 'rating' %}gf-chip-green{% else %}gf-chip-red{% endif %}" style="font-size:.75rem;">
+          {% if q.question_type == 'single' %}⦿ Нэг сонголт
+          {% elif q.question_type == 'multiple' %}☑ Олон сонголт
+          {% elif q.question_type == 'rating' %}★ Үнэлгээ
+          {% else %}✏ Текст{% endif %}
+        </span>
+        <button onclick="deleteQ({{ q.id }})" class="icon-btn" title="Устгах" style="color:#80868b; font-size:.9rem;">🗑</button>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div id="emptyState" style="text-align:center; padding:48px; background:#fff; border-radius:8px;
+        box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);
+        color:#80868b; font-size:.9rem;">
+        Асуулт байхгүй байна. Доорх товчоор нэмнэ үү.
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Add question panel -->
+  <div class="add-panel">
+    <div class="add-panel-header" onclick="togglePanel()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#673ab7"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      Асуулт нэмэх
+    </div>
+    <div class="add-panel-body" id="addPanel">
+
+      <div style="margin-bottom:18px;">
+        <label style="font-size:.85rem; color:#5f6368; display:block; margin-bottom:6px;">Асуулт</label>
+        <input type="text" id="qText" class="gf-input-box" placeholder="Асуултаа оруулна уу...">
+      </div>
+
+      <div style="margin-bottom:18px;">
+        <label style="font-size:.85rem; color:#5f6368; display:block; margin-bottom:8px;">Асуултын төрөл</label>
+        <div class="type-grid">
+          <div class="type-opt selected" data-val="single" onclick="selectType('single')">⦿ Нэг сонголт</div>
+          <div class="type-opt" data-val="multiple" onclick="selectType('multiple')">☑ Олон сонголт</div>
+          <div class="type-opt" data-val="rating" onclick="selectType('rating')">★ Үнэлгээ (1–5)</div>
+          <div class="type-opt" data-val="text" onclick="selectType('text')">✏ Нээлттэй текст</div>
+        </div>
+      </div>
+
+      <div id="optSection" style="margin-bottom:20px;">
+        <label style="font-size:.85rem; color:#5f6368; display:block; margin-bottom:8px;">Сонголтууд</label>
+        <div id="optList">
+          <div class="opt-row">
+            <span style="color:#80868b; font-size:.9rem;">○</span>
+            <input type="text" class="gf-input-box opt-input" placeholder="Сонголт 1" style="padding:8px 10px;">
+            <button class="opt-del" onclick="delOpt(this)">×</button>
+          </div>
+          <div class="opt-row">
+            <span style="color:#80868b; font-size:.9rem;">○</span>
+            <input type="text" class="gf-input-box opt-input" placeholder="Сонголт 2" style="padding:8px 10px;">
+            <button class="opt-del" onclick="delOpt(this)">×</button>
+          </div>
+        </div>
+        <button class="gf-btn gf-btn-text" style="padding:6px 10px; font-size:.82rem; margin-top:4px;" onclick="addOpt()">+ Сонголт нэмэх</button>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button class="gf-btn gf-btn-primary" onclick="saveQ()">Нэмэх</button>
+        <button class="gf-btn gf-btn-text" onclick="togglePanel()">Цуцлах</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const surveyId = {{ survey.id }};
+let selectedType = 'single';
+let qCount = {{ questions|length }};
+
+function togglePanel() {
+  const b = document.getElementById('addPanel');
+  b.classList.toggle('open');
+}
+
+function selectType(t) {
+  selectedType = t;
+  document.querySelectorAll('.type-opt').forEach(el => {
+    el.classList.toggle('selected', el.dataset.val === t);
+  });
+  document.getElementById('optSection').style.display = (t === 'rating' || t === 'text') ? 'none' : 'block';
+}
+
+function addOpt() {
+  const list = document.getElementById('optList');
+  const n = list.children.length + 1;
+  const row = document.createElement('div');
+  row.className = 'opt-row';
+  row.innerHTML = `<span style="color:#80868b;font-size:.9rem;">○</span>
+    <input type="text" class="gf-input-box opt-input" placeholder="Сонголт ${n}" style="padding:8px 10px;">
+    <button class="opt-del" onclick="delOpt(this)">×</button>`;
+  list.appendChild(row);
+}
+
+function delOpt(btn) {
+  const list = document.getElementById('optList');
+  if (list.children.length > 1) btn.closest('.opt-row').remove();
+}
+
+function chipClass(t) {
+  return {single:'gf-chip-purple', multiple:'gf-chip-blue', rating:'gf-chip-green', text:'gf-chip-red'}[t];
+}
+function chipLabel(t) {
+  return {single:'⦿ Нэг сонголт', multiple:'☑ Олон сонголт', rating:'★ Үнэлгээ', text:'✏ Текст'}[t];
+}
+
+async function saveQ() {
+  const text = document.getElementById('qText').value.trim();
+  if (!text) { document.getElementById('qText').focus(); return; }
+
+  let options = [];
+  if (selectedType === 'single' || selectedType === 'multiple') {
+    options = Array.from(document.querySelectorAll('.opt-input')).map(i => i.value.trim()).filter(v => v);
+    if (options.length < 2) { alert('Хамгийн багадаа 2 сонголт оруулна уу'); return; }
+  }
+
+  const res = await fetch(`/admin/survey/${surveyId}/add-question`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({text, type: selectedType, options})
+  });
+  const data = await res.json();
+
+  const empty = document.getElementById('emptyState');
+  if (empty) empty.remove();
+
+  qCount++;
+  const div = document.createElement('div');
+  div.className = 'q-card'; div.id = `qi_${data.id}`;
+  div.innerHTML = `
+    <span class="q-num">${qCount}</span>
+    <span class="q-text">${data.text}</span>
+    <span class="gf-chip ${chipClass(data.type)}" style="font-size:.75rem;">${chipLabel(data.type)}</span>
+    <button onclick="deleteQ(${data.id})" class="icon-btn" style="color:#80868b;font-size:.9rem;">🗑</button>`;
+  document.getElementById('qList').appendChild(div);
+
+  document.getElementById('qText').value = '';
+  document.getElementById('addPanel').classList.remove('open');
+}
+
+async function deleteQ(id) {
+  if (!confirm('Устгахдаа итгэлтэй байна уу?')) return;
+  await fetch(`/admin/question/${id}/delete`, {method:'POST'});
+  document.getElementById(`qi_${id}`).remove();
+  qCount--;
+  if (!document.querySelector('.q-card')) {
+    const div = document.createElement('div');
+    div.id = 'emptyState';
+    div.style.cssText = 'text-align:center;padding:48px;background:#fff;border-radius:8px;box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);color:#80868b;font-size:.9rem;';
+    div.textContent = 'Асуулт байхгүй байна. Доорх товчоор нэмнэ үү.';
+    document.getElementById('qList').appendChild(div);
+  }
+}
+</script>
+{% endblock %}
