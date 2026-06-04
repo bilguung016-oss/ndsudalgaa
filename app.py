@@ -34,9 +34,14 @@ class Question(db.Model):
     options = db.Column(db.Text)  # JSON array of option strings
     order = db.Column(db.Integer, default=0)
     parent_question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=True)
-    trigger_value = db.Column(db.String(500), nullable=True)  # answer value that triggers this sub-question
-    sub_questions = db.relationship('Question', backref=db.backref('parent', remote_side='Question.id'),
-                                    lazy=True, cascade='all, delete-orphan')
+    trigger_value = db.Column(db.String(500), nullable=True)
+    sub_questions = db.relationship(
+        'Question',
+        foreign_keys='[Question.parent_question_id]',
+        lazy=True,
+        cascade='all, delete-orphan',
+        single_parent=True
+    )
     answers = db.relationship('Answer', backref='question', lazy=True, cascade='all, delete-orphan')
 
     def get_options(self):
