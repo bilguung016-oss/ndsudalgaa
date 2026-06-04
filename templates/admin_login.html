@@ -1,31 +1,21 @@
 {% extends "base.html" %}
 {% block title %}Нэвтрэх{% endblock %}
-{% block topbar_actions %}<a href="/" class="nav-btn">Нүүр</a>{% endblock %}
+{% block topbar_actions %}<a href="/" class="topbar-link">← Нүүр</a>{% endblock %}
 {% block content %}
-<div style="max-width:400px; margin:40px auto;">
-  <div style="background:#fff; border-radius:8px; border-top:10px solid #673ab7; box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06); padding:32px;">
-    <div style="text-align:center; margin-bottom:28px;">
-      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style="margin-bottom:12px">
-        <rect x="6" y="4" width="36" height="40" rx="4" fill="#673ab7"/>
-        <rect x="12" y="14" width="24" height="3" rx="1.5" fill="white" opacity=".9"/>
-        <rect x="12" y="21" width="24" height="3" rx="1.5" fill="white" opacity=".9"/>
-        <rect x="12" y="28" width="16" height="3" rx="1.5" fill="white" opacity=".9"/>
-      </svg>
-      <h2 style="font-size:1.25rem; font-weight:400; color:#202124;">Судалгааны систем</h2>
-      <p style="font-size:.85rem; color:#5f6368; margin-top:4px;">Нэвтрэхийн тулд нууц үгийг оруулна уу</p>
+<div style="max-width:380px; margin:80px auto;">
+  <div class="section-eyebrow" style="text-align:center;">Систем</div>
+  <h2 style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:400; text-align:center; margin-bottom:40px;">Нэвтрэх</h2>
+
+  {% if error %}
+  <div class="alert alert-error">{{ error }}</div>
+  {% endif %}
+
+  <form method="POST" action="/admin/login">
+    <div style="margin-bottom:20px;">
+      <label style="font-size:.7rem; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:8px;">Нууц үг</label>
+      <input type="password" name="password" class="input-box" placeholder="••••••••" autofocus required>
     </div>
-
-    {% if error %}
-    <div class="gf-alert gf-alert-error">{{ error }}</div>
-    {% endif %}
-
-    <form method="POST" action="/admin/login">
-      <div style="margin-bottom:20px;">
-        <label style="font-size:.85rem; color:#5f6368; display:block; margin-bottom:6px;">Нууц үг</label>
-        <input type="password" name="password" class="gf-input-box" placeholder="••••••••" autofocus required>
-      </div>
-      <button type="submit" class="gf-btn gf-btn-primary" style="width:100%; justify-content:center; padding:12px;">Нэвтрэх</button>
-    </form>
-  </div>
+    <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center;">Нэвтрэх</button>
+  </form>
 </div>
 {% endblock %}

@@ -1,134 +1,103 @@
 {% extends "base.html" %}
 {% block title %}{{ survey.title }} — засах{% endblock %}
 {% block topbar_actions %}
-<a href="/survey/{{ survey.id }}" target="_blank" class="nav-btn">👁 Урьдчилан харах</a>
-<a href="/admin/survey/{{ survey.id }}/results" class="nav-btn">📊 Үр дүн</a>
-<a href="/admin/dashboard" class="nav-btn">← Буцах</a>
+<a href="/survey/{{ survey.id }}" target="_blank" class="topbar-link">Харах</a>
+<a href="/admin/survey/{{ survey.id }}/results" class="topbar-link">Үр дүн</a>
+<a href="/admin/dashboard" class="topbar-link">← Буцах</a>
 {% endblock %}
 {% block head %}
 <style>
   .q-card {
-    background:#fff; border-radius:8px; padding:18px 22px;
-    box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);
-    margin-bottom:8px; border-left:4px solid transparent;
-    transition:box-shadow .15s, border-color .2s; cursor:pointer;
+    background:var(--bg2); border:1px solid var(--border);
+    border-left:3px solid transparent; padding:18px 22px;
+    margin-bottom:4px; transition:border-color .2s; cursor:pointer;
   }
-  .q-card:hover { box-shadow:0 4px 8px rgba(0,0,0,.12); border-left-color:#e8eaed; }
-  .q-card.editing { border-left-color:#673ab7; cursor:default; }
-
-  /* Sub-question card */
+  .q-card:hover { border-left-color:var(--border2); }
+  .q-card.editing { border-left-color:var(--gold); cursor:default; }
   .sub-card {
-    background:#faf7ff; border-radius:8px; padding:14px 18px;
-    border-left:3px solid #673ab7; margin:8px 0 0 28px;
-    box-shadow:0 1px 3px rgba(103,58,183,.1);
-    display:flex; align-items:center; gap:10px; cursor:pointer;
+    background:var(--bg3); border:1px solid var(--border);
+    border-left:2px solid var(--gold); padding:14px 18px;
+    margin:4px 0 0 24px; cursor:pointer; transition:border-color .2s;
   }
-  .sub-card:hover { box-shadow:0 2px 6px rgba(103,58,183,.18); }
-  .sub-card.editing { background:#f3e8fd; cursor:default; }
+  .sub-card.editing { cursor:default; }
   .sub-trigger-tag {
-    font-size:.72rem; background:#ede7f6; color:#512da8;
-    border-radius:12px; padding:2px 8px; white-space:nowrap;
-    font-weight:500;
+    font-size:.65rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--gold); background:rgba(201,169,110,.1);
+    border:1px solid rgba(201,169,110,.2); padding:2px 8px; white-space:nowrap;
   }
-
-  /* View row */
   .q-view { display:flex; align-items:center; gap:10px; }
-  .q-num { font-size:.78rem; color:#80868b; min-width:18px; flex-shrink:0; }
-  .q-text-label { flex:1; font-size:.9rem; color:#202124; }
+  .q-num { font-size:.65rem; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--gold); min-width:18px; flex-shrink:0; }
+  .q-text-label { flex:1; font-size:.88rem; color:var(--text); }
   .q-actions { display:flex; gap:4px; opacity:0; transition:opacity .15s; }
-  .q-card:hover .q-actions,
-  .sub-card:hover .q-actions { opacity:1; }
-
-  /* Edit panel */
+  .q-card:hover .q-actions, .sub-card:hover .q-actions { opacity:1; }
   .q-edit { display:none; }
-  .q-card.editing .q-view,
-  .sub-card.editing .q-view { display:none; }
-  .q-card.editing .q-edit,
-  .sub-card.editing .q-edit { display:block; }
-
-  /* Add sub-question button row */
-  .add-sub-row {
-    margin: 6px 0 0 28px;
-    display:flex; flex-wrap:wrap; gap:6px;
-  }
+  .q-card.editing .q-view, .sub-card.editing .q-view { display:none; }
+  .q-card.editing .q-edit, .sub-card.editing .q-edit { display:block; }
+  .add-sub-row { margin:4px 0 0 24px; display:flex; flex-wrap:wrap; gap:6px; }
   .add-sub-btn {
-    font-size:.78rem; color:#673ab7; background:#ede7f6;
-    border:none; border-radius:12px; padding:4px 12px;
-    cursor:pointer; font-family:inherit; transition:background .12s;
+    font-size:.68rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--gold); background:rgba(201,169,110,.08); border:1px solid rgba(201,169,110,.2);
+    padding:4px 12px; cursor:pointer; font-family:inherit; transition:background .12s;
   }
-  .add-sub-btn:hover { background:#d1c4e9; }
-
-  /* Sub add panel */
+  .add-sub-btn:hover { background:rgba(201,169,110,.15); }
   .sub-add-panel {
-    display:none; margin:8px 0 0 28px;
-    background:#faf7ff; border:1.5px solid #d1c4e9;
-    border-radius:8px; padding:18px 20px;
+    display:none; margin:4px 0 0 24px;
+    background:var(--bg3); border:1px solid rgba(201,169,110,.2);
+    border-left:2px solid var(--gold); padding:18px 20px;
   }
   .sub-add-panel.open { display:block; }
-
-  /* Type grid */
-  .type-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:16px; }
+  .type-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:6px; margin-bottom:14px; }
   .type-opt {
-    border:1.5px solid #e8eaed; border-radius:6px; padding:9px 12px;
-    cursor:pointer; font-size:.82rem; color:#5f6368;
+    border:1px solid var(--border); padding:9px 12px;
+    cursor:pointer; font-size:.78rem; color:var(--muted);
     display:flex; align-items:center; gap:6px; transition:all .15s;
   }
-  .type-opt:hover { border-color:#673ab7; color:#673ab7; background:#f3e8fd; }
-  .type-opt.selected { border-color:#673ab7; color:#673ab7; background:#f3e8fd; font-weight:500; }
-
-  /* Option rows */
+  .type-opt:hover { border-color:var(--gold); color:var(--gold); }
+  .type-opt.selected { border-color:var(--gold); color:var(--gold); background:rgba(201,169,110,.06); font-weight:500; }
   .opt-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
   .opt-row input { flex:1; }
   .opt-del {
-    width:30px; height:30px; border-radius:50%; border:none;
-    background:transparent; cursor:pointer; color:#80868b;
-    font-size:1rem; display:flex; align-items:center; justify-content:center;
-    transition:background .12s; flex-shrink:0;
+    width:28px; height:28px; border:none; background:transparent;
+    cursor:pointer; color:var(--muted); font-size:1rem;
+    display:flex; align-items:center; justify-content:center;
+    transition:color .12s; flex-shrink:0;
   }
-  .opt-del:hover { background:#fce8e6; color:#d93025; }
-
-  /* Header editable */
+  .opt-del:hover { color:var(--danger); }
   .header-title {
-    font-size:1.6rem; font-weight:400; color:#202124;
-    border:none; outline:none; width:100%;
-    border-bottom:2px solid transparent; background:transparent;
-    font-family:inherit; padding:2px 0; transition:border-color .2s;
+    font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:400;
+    color:var(--text); border:none; outline:none; width:100%;
+    border-bottom:1px solid transparent; background:transparent;
+    padding:2px 0; transition:border-color .2s;
   }
-  .header-title:focus { border-bottom-color:#673ab7; }
+  .header-title:focus { border-bottom-color:var(--gold); }
   .header-desc {
-    font-size:.9rem; color:#5f6368; border:none; outline:none;
-    width:100%; border-bottom:1px solid transparent;
-    background:transparent; font-family:inherit;
-    padding:2px 0; margin-top:6px; resize:none; transition:border-color .2s;
+    font-size:.88rem; color:var(--muted); border:none; outline:none;
+    width:100%; border-bottom:1px solid transparent; background:transparent;
+    font-family:inherit; padding:2px 0; margin-top:8px; resize:none; transition:border-color .2s;
   }
-  .header-desc:focus { border-bottom-color:#673ab7; }
-  .save-badge {
-    display:none; font-size:.75rem; color:#16a34a; margin-left:8px;
-  }
-
-  /* Add question panel */
-  .add-panel {
-    background:#fff; border-radius:8px;
-    box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);
-    margin-top:12px; overflow:hidden;
-  }
+  .header-desc:focus { border-bottom-color:var(--gold); }
+  .save-badge { display:none; font-size:.7rem; color:var(--gold); margin-left:8px; }
+  .add-panel { background:var(--bg2); border:1px solid var(--border); margin-top:8px; }
   .add-panel-header {
-    padding:16px 24px; cursor:pointer;
-    display:flex; align-items:center; gap:10px;
-    font-size:.9rem; font-weight:500; color:#673ab7; transition:background .15s;
+    padding:16px 22px; cursor:pointer; display:flex; align-items:center; gap:10px;
+    font-size:.72rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--gold); transition:background .15s;
   }
-  .add-panel-header:hover { background:#f3e8fd; }
-  .add-panel-body { display:none; padding:24px; border-top:1px solid #e8eaed; }
+  .add-panel-header:hover { background:rgba(201,169,110,.05); }
+  .add-panel-body { display:none; padding:24px; border-top:1px solid var(--border); }
   .add-panel-body.open { display:block; }
+  label.edit-label {
+    font-size:.68rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--muted); display:block; margin-bottom:6px;
+  }
 </style>
 {% endblock %}
 {% block body %}
-<div class="gf-page">
+<div class="page">
 
   <!-- Survey header — inline editable -->
-  <div style="background:#fff; border-radius:8px; border-top:10px solid #673ab7;
-    box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);
-    padding:24px; margin-bottom:12px;">
+  <div style="background:var(--bg2); border:1px solid var(--border); border-left:3px solid var(--gold);
+    padding:28px 32px; margin-bottom:8px;">
     <div style="display:flex; align-items:flex-start; gap:8px;">
       <div style="flex:1;">
         <input class="header-title" id="surveyTitle" type="text"
@@ -150,7 +119,7 @@
         <div class="q-view">
           <span class="q-num">{{ loop.index }}</span>
           <span class="q-text-label" id="qlabel_{{ q.id }}">{{ q.text }}</span>
-          <span class="gf-chip {{ 'gf-chip-purple' if q.question_type=='single' else 'gf-chip-blue' if q.question_type=='multiple' else 'gf-chip-green' if q.question_type=='rating' else 'gf-chip-red' }}" id="qchip_{{ q.id }}" style="font-size:.72rem;">
+          <span class="tag {{ 'tag-purple' if q.question_type=='single' else 'tag-blue' if q.question_type=='multiple' else 'tag-green' if q.question_type=='rating' else 'tag-gold' }}" id="qchip_{{ q.id }}" style="font-size:.72rem;">
             {{ '⦿ Нэг' if q.question_type=='single' else '☑ Олон' if q.question_type=='multiple' else '★ Үнэлгээ' if q.question_type=='rating' else '✏ Текст' }}
           </span>
           <div class="q-actions">
@@ -172,7 +141,7 @@
           <span style="color:#9c4dcc;font-size:.85rem;">↳</span>
           <span class="sub-trigger-tag">"{{ sub.trigger_value }}" үед</span>
           <span class="q-text-label" id="qlabel_{{ sub.id }}" style="font-size:.88rem;">{{ sub.text }}</span>
-          <span class="gf-chip {{ 'gf-chip-purple' if sub.question_type=='single' else 'gf-chip-blue' if sub.question_type=='multiple' else 'gf-chip-green' if sub.question_type=='rating' else 'gf-chip-red' }}" id="qchip_{{ sub.id }}" style="font-size:.7rem;">
+          <span class="tag {{ 'tag-purple' if sub.question_type=='single' else 'tag-blue' if sub.question_type=='multiple' else 'tag-green' if sub.question_type=='rating' else 'tag-gold' }}" id="qchip_{{ sub.id }}" style="font-size:.7rem;">
             {{ '⦿ Нэг' if sub.question_type=='single' else '☑ Олон' if sub.question_type=='multiple' else '★ Үнэлгээ' if sub.question_type=='rating' else '✏ Текст' }}
           </span>
           <div class="q-actions">

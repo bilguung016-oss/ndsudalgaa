@@ -1,77 +1,81 @@
 {% extends "base.html" %}
 {% block title %}Миний судалгаанууд{% endblock %}
 {% block topbar_actions %}
-<a href="/" class="nav-btn">Нүүр</a>
-<a href="/admin/survey/new" class="nav-btn primary">+ Шинэ судалгаа</a>
-<a href="/admin/logout" class="nav-btn" style="color:#d93025;">Гарах</a>
+<a href="/" class="topbar-link">Нүүр</a>
+<a href="/admin/survey/new" class="topbar-link active">+ Шинэ</a>
+<a href="/admin/logout" class="topbar-link" style="color:var(--danger);">Гарах</a>
 {% endblock %}
 {% block body %}
-<div class="gf-page wide">
+<div class="page wide">
 
-  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
-    <h2 style="font-size:1rem; font-weight:500; color:#5f6368;">Миний судалгаанууд</h2>
+  <div style="display:flex; align-items:flex-end; justify-content:space-between; padding:56px 0 32px; flex-wrap:wrap; gap:16px;">
+    <div>
+      <div class="section-eyebrow">Удирдлага</div>
+      <h1 class="section-title" style="margin-bottom:0;">Судалгаанууд</h1>
+    </div>
+    <a href="/admin/survey/new" class="btn btn-gold">+ Шинэ судалгаа</a>
   </div>
+
+  <div class="divider"></div>
 
   {% if surveys %}
-  <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px;">
-    {% for survey in surveys %}
-    <div style="background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);">
-      <!-- Thumbnail -->
-      <div style="height:130px; background:linear-gradient(135deg,#673ab7 0%,#9c4dcc 100%); position:relative; cursor:pointer;" onclick="location.href='/admin/survey/{{ survey.id }}/edit'">
-        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
-          <svg width="52" height="52" viewBox="0 0 48 48" fill="none">
-            <rect x="6" y="4" width="36" height="40" rx="4" fill="rgba(255,255,255,.2)"/>
-            <rect x="12" y="14" width="24" height="3" rx="1.5" fill="white" opacity=".85"/>
-            <rect x="12" y="21" width="24" height="3" rx="1.5" fill="white" opacity=".85"/>
-            <rect x="12" y="28" width="16" height="3" rx="1.5" fill="white" opacity=".85"/>
-          </svg>
-        </div>
-        <div style="position:absolute; top:8px; right:8px;">
-          <span class="gf-chip {{ 'gf-chip-green' if survey.is_active else 'gf-chip-red' }}">
+  <table style="width:100%; border-collapse:collapse; margin-top:24px;">
+    <thead>
+      <tr style="border-bottom:1px solid var(--border);">
+        <th style="text-align:left; padding:10px 16px; font-size:.65rem; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--muted);">Гарчиг</th>
+        <th style="text-align:left; padding:10px 16px; font-size:.65rem; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--muted);">Огноо</th>
+        <th style="text-align:center; padding:10px 16px; font-size:.65rem; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--muted);">Хариулт</th>
+        <th style="text-align:center; padding:10px 16px; font-size:.65rem; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--muted);">Төлөв</th>
+        <th style="padding:10px 16px;"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for survey in surveys %}
+      <tr style="border-bottom:1px solid var(--border); transition:background .15s;"
+        onmouseenter="this.style.background='var(--bg2)'" onmouseleave="this.style.background='transparent'">
+        <td style="padding:18px 16px;">
+          <a href="/admin/survey/{{ survey.id }}/edit" style="text-decoration:none;">
+            <div style="font-size:.95rem; color:var(--text); margin-bottom:4px;">{{ survey.title }}</div>
+            {% if survey.description %}
+            <div style="font-size:.78rem; color:var(--muted);">{{ survey.description[:60] }}{% if survey.description|length > 60 %}…{% endif %}</div>
+            {% endif %}
+          </a>
+        </td>
+        <td style="padding:18px 16px; font-size:.78rem; color:var(--muted); white-space:nowrap;">
+          {{ survey.created_at.strftime('%Y-%m-%d') }}
+        </td>
+        <td style="padding:18px 16px; text-align:center;">
+          <span style="font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--text);">{{ stats[survey.id] }}</span>
+        </td>
+        <td style="padding:18px 16px; text-align:center;">
+          <span class="tag {{ 'tag-green' if survey.is_active else 'tag-red' }}">
             {{ 'Идэвхтэй' if survey.is_active else 'Хаагдсан' }}
           </span>
-        </div>
-      </div>
-
-      <!-- Info -->
-      <div style="padding:12px 16px 6px;">
-        <div style="font-size:.95rem; font-weight:500; color:#202124; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer;" onclick="location.href='/admin/survey/{{ survey.id }}/edit'">
-          {{ survey.title }}
-        </div>
-        <div style="font-size:.78rem; color:#80868b;">
-          {{ survey.created_at.strftime('%Y-%m-%d') }} &nbsp;·&nbsp;
-          <strong style="color:#5f6368;">{{ stats[survey.id] }}</strong> хариулт
-        </div>
-      </div>
-
-      <!-- Actions -->
-      <div style="display:flex; align-items:center; padding:4px 8px 8px; gap:4px;">
-        <a href="/admin/survey/{{ survey.id }}/results" class="gf-btn gf-btn-text" style="font-size:.8rem; padding:7px 10px;">📊 Үр дүн</a>
-        <a href="/admin/survey/{{ survey.id }}/edit" class="gf-btn gf-btn-text" style="font-size:.8rem; padding:7px 10px;">✏️ Засах</a>
-        <div style="flex:1;"></div>
-        <form method="POST" action="/admin/survey/{{ survey.id }}/toggle" style="display:inline;">
-          <button type="submit" class="icon-btn" title="{{ 'Зогсоох' if survey.is_active else 'Нээх' }}" style="font-size:.9rem;">
-            {{ '⏸' if survey.is_active else '▶' }}
-          </button>
-        </form>
-        <form method="POST" action="/admin/survey/{{ survey.id }}/delete" style="display:inline;" onsubmit="return confirm('Устгахдаа итгэлтэй байна уу?')">
-          <button type="submit" class="icon-btn" title="Устгах" style="color:#d93025;">🗑</button>
-        </form>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
+        </td>
+        <td style="padding:18px 16px;">
+          <div style="display:flex; align-items:center; gap:6px; justify-content:flex-end;">
+            <a href="/admin/survey/{{ survey.id }}/results" class="btn btn-ghost" style="padding:7px 14px; font-size:.68rem;">Үр дүн</a>
+            <a href="/admin/survey/{{ survey.id }}/edit" class="btn btn-ghost" style="padding:7px 14px; font-size:.68rem;">Засах</a>
+            <form method="POST" action="/admin/survey/{{ survey.id }}/toggle" style="display:inline;">
+              <button type="submit" class="btn btn-ghost" style="padding:7px 14px; font-size:.68rem;">
+                {{ 'Зогсоох' if survey.is_active else 'Нээх' }}
+              </button>
+            </form>
+            <form method="POST" action="/admin/survey/{{ survey.id }}/delete" style="display:inline;"
+              onsubmit="return confirm('Устгахдаа итгэлтэй байна уу?')">
+              <button type="submit" class="icon-btn danger" title="Устгах">✕</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
   {% else %}
-  <div style="text-align:center; padding:80px 24px; background:#fff; border-radius:8px; box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);">
-    <svg width="72" height="72" viewBox="0 0 48 48" fill="none" style="opacity:.25; margin-bottom:16px;">
-      <rect x="6" y="4" width="36" height="40" rx="4" fill="#673ab7"/>
-      <rect x="12" y="14" width="24" height="3" rx="1.5" fill="white"/>
-      <rect x="12" y="21" width="24" height="3" rx="1.5" fill="white"/>
-      <rect x="12" y="28" width="16" height="3" rx="1.5" fill="white"/>
-    </svg>
-    <p style="font-size:1rem; color:#80868b; margin-bottom:20px;">Судалгаа байхгүй байна</p>
-    <a href="/admin/survey/new" class="gf-btn gf-btn-primary">+ Шинэ судалгаа үүсгэх</a>
+  <div style="padding:80px 0; text-align:center; color:var(--muted);">
+    <p style="font-size:.88rem; margin-bottom:24px;">Судалгаа байхгүй байна</p>
+    <a href="/admin/survey/new" class="btn btn-outline">+ Шинэ судалгаа үүсгэх</a>
   </div>
   {% endif %}
 

@@ -4,250 +4,299 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Судалгаа{% endblock %}</title>
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --bg:       #080808;
+      --bg2:      #111111;
+      --bg3:      #1a1a1a;
+      --border:   #2a2a2a;
+      --border2:  #333333;
+      --text:     #f0ede8;
+      --muted:    #888880;
+      --gold:     #c9a96e;
+      --gold2:    #e8c988;
+      --white:    #ffffff;
+      --danger:   #c0392b;
+    }
+
+    html { scroll-behavior: smooth; }
+
     body {
-      font-family: 'Google Sans', 'Roboto', sans-serif;
-      background: #f0ebf8;
-      color: #202124;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
+      line-height: 1.6;
     }
 
-    /* Top nav bar */
-    .gf-topbar {
+    /* ── Topbar ── */
+    .topbar {
       position: sticky; top: 0; z-index: 100;
-      background: #fff;
-      border-bottom: 1px solid #e0e0e0;
-      height: 64px;
-      display: flex; align-items: center; padding: 0 24px;
-      gap: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,.08);
+      background: rgba(8,8,8,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      height: 60px;
+      display: flex; align-items: center;
+      padding: 0 32px; gap: 16px;
     }
-    .gf-topbar .logo {
-      display: flex; align-items: center; gap: 8px;
-      text-decoration: none; color: #5f6368;
+    .topbar-logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; color: var(--text);
     }
-    .gf-topbar .logo svg { width: 32px; height: 32px; }
-    .gf-topbar .logo-text { font-size: 1.25rem; color: #5f6368; font-weight: 400; }
-    .gf-topbar .spacer { flex: 1; }
-    .gf-topbar .nav-btn {
-      display: flex; align-items: center; gap: 6px;
-      padding: 8px 16px; border-radius: 4px;
-      text-decoration: none; font-size: .875rem; font-weight: 500;
-      border: none; cursor: pointer; background: transparent;
-      color: #5f6368; transition: background .15s;
+    .topbar-logo-icon {
+      width: 28px; height: 28px; border: 1.5px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; color: var(--gold); font-family: 'Playfair Display', serif;
+      letter-spacing: .05em;
     }
-    .gf-topbar .nav-btn:hover { background: #f1f3f4; }
-    .gf-topbar .nav-btn.primary {
-      background: #673ab7; color: #fff; border-radius: 4px;
+    .topbar-logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; font-weight: 500; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--text);
     }
-    .gf-topbar .nav-btn.primary:hover { background: #5e35b1; }
+    .topbar-spacer { flex: 1; }
+    .topbar-link {
+      font-size: .78rem; font-weight: 500; letter-spacing: .1em;
+      text-transform: uppercase; text-decoration: none;
+      color: var(--muted); transition: color .2s; background: none;
+      border: none; cursor: pointer; font-family: inherit; padding: 6px 12px;
+    }
+    .topbar-link:hover { color: var(--text); }
+    .topbar-link.active {
+      color: var(--gold); border-bottom: 1px solid var(--gold);
+    }
 
-    /* Page container */
-    .gf-page { max-width: 770px; margin: 0 auto; padding: 24px 16px 64px; }
-    .gf-page.wide { max-width: 960px; }
+    /* ── Page ── */
+    .page { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+    .page.wide { max-width: 1100px; }
 
-    /* Cards */
-    .gf-card {
-      background: #fff;
-      border-radius: 8px;
-      border-top: 10px solid #673ab7;
-      box-shadow: 0 2px 1px -1px rgba(0,0,0,.1), 0 1px 1px rgba(0,0,0,.07), 0 1px 3px rgba(0,0,0,.06);
+    /* ── Section title ── */
+    .section-eyebrow {
+      font-size: .7rem; font-weight: 600; letter-spacing: .2em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem; font-weight: 400; color: var(--text);
+      line-height: 1.2; margin-bottom: 8px;
+    }
+    .section-sub {
+      font-size: .88rem; color: var(--muted); margin-bottom: 32px;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 32px;
       margin-bottom: 12px;
-      overflow: hidden;
+      position: relative;
     }
-    .gf-card.flat { border-top: none; }
-    .gf-card-body { padding: 24px; }
-    .gf-card:focus-within { border-left: 6px solid #673ab7; border-top: none; padding-left: 0; }
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 3px; height: 100%; background: var(--gold);
+      opacity: 0; transition: opacity .2s;
+    }
+    .card:focus-within::before { opacity: 1; }
+    .card-header {
+      border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 24px;
+    }
+    .card-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 400; color: var(--text); line-height: 1.3;
+    }
+    .card-header .desc {
+      font-size: .88rem; color: var(--muted); margin-top: 8px; line-height: 1.7;
+    }
+    .card-header .required-note {
+      font-size: .72rem; color: var(--gold); margin-top: 16px;
+      letter-spacing: .05em;
+    }
 
-    /* Question card */
-    .gf-question {
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 1px -1px rgba(0,0,0,.1), 0 1px 1px rgba(0,0,0,.07), 0 1px 3px rgba(0,0,0,.06);
-      margin-bottom: 12px;
-      padding: 24px;
-      border-left: 6px solid transparent;
+    /* ── Question block ── */
+    .question-block {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-left: 3px solid transparent;
+      padding: 28px 32px;
+      margin-bottom: 10px;
       transition: border-color .2s;
     }
-    .gf-question:focus-within { border-left-color: #673ab7; }
-
-    /* Survey header card */
-    .gf-header-card {
-      background: #fff;
-      border-radius: 8px;
-      border-top: 10px solid #673ab7;
-      box-shadow: 0 2px 1px -1px rgba(0,0,0,.1), 0 1px 1px rgba(0,0,0,.07), 0 1px 3px rgba(0,0,0,.06);
-      padding: 24px;
-      margin-bottom: 12px;
+    .question-block:focus-within { border-left-color: var(--gold); }
+    .question-label {
+      font-size: .95rem; font-weight: 400; color: var(--text);
+      margin-bottom: 18px; line-height: 1.6;
     }
-    .gf-header-card h1 { font-size: 2rem; font-weight: 400; color: #202124; }
-    .gf-header-card .desc { font-size: .9rem; color: #5f6368; margin-top: 8px; line-height: 1.6; }
-    .gf-header-card .required-note { font-size: .8rem; color: #d93025; margin-top: 12px; }
-
-    /* Form elements */
-    .gf-label { font-size: 1rem; font-weight: 400; color: #202124; margin-bottom: 12px; display: block; line-height: 1.5; }
-    .gf-required { color: #d93025; margin-left: 3px; }
-
-    /* Radio / Checkbox options */
-    .gf-option {
-      display: flex; align-items: center; gap: 12px;
-      padding: 10px 4px; cursor: pointer;
-      border-radius: 4px; transition: background .12s;
-      position: relative;
+    .question-num {
+      font-size: .65rem; font-weight: 600; letter-spacing: .15em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 8px;
     }
-    .gf-option:hover { background: #f1f3f4; }
-    .gf-option input[type=radio],
-    .gf-option input[type=checkbox] {
+    .required-star { color: var(--gold); margin-left: 3px; }
+
+    /* ── Options ── */
+    .opt-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 10px 14px; cursor: pointer;
+      border: 1px solid transparent;
+      transition: border-color .15s, background .15s; margin-bottom: 4px;
+    }
+    .opt-item:hover { border-color: var(--border2); background: var(--bg3); }
+    .opt-item input[type=radio],
+    .opt-item input[type=checkbox] {
       appearance: none; -webkit-appearance: none;
-      width: 20px; height: 20px; border: 2px solid #5f6368;
-      cursor: pointer; flex-shrink: 0; transition: border-color .15s;
-      position: relative;
+      width: 18px; height: 18px; border: 1px solid var(--border2);
+      cursor: pointer; flex-shrink: 0; transition: all .15s;
+      background: transparent; position: relative;
     }
-    .gf-option input[type=radio] { border-radius: 50%; }
-    .gf-option input[type=checkbox] { border-radius: 2px; }
-    .gf-option input[type=radio]:checked { border-color: #673ab7; border-width: 6px; }
-    .gf-option input[type=checkbox]:checked {
-      background: #673ab7; border-color: #673ab7;
+    .opt-item input[type=radio] { border-radius: 50%; }
+    .opt-item input[type=radio]:checked {
+      border-color: var(--gold); border-width: 5px;
+      background: var(--bg2);
     }
-    .gf-option input[type=checkbox]:checked::after {
-      content: ''; position: absolute; left: 3px; top: 0px;
-      width: 6px; height: 10px;
-      border: 2px solid #fff; border-top: none; border-left: none;
+    .opt-item input[type=checkbox]:checked {
+      background: var(--gold); border-color: var(--gold);
+    }
+    .opt-item input[type=checkbox]:checked::after {
+      content: ''; position: absolute; left: 3px; top: 0;
+      width: 5px; height: 9px;
+      border: 1.5px solid var(--bg); border-top: none; border-left: none;
       transform: rotate(45deg);
     }
-    .gf-option span { font-size: .9rem; color: #202124; user-select: none; }
+    .opt-item span { font-size: .88rem; color: var(--text); user-select: none; }
 
-    /* Text input - Google Forms underline style */
-    .gf-input {
-      width: 100%; padding: 8px 0; border: none;
-      border-bottom: 1px solid #dadce0; font-size: .9rem;
-      font-family: inherit; color: #202124; background: transparent;
-      outline: none; transition: border-color .2s;
-    }
-    .gf-input:focus { border-bottom: 2px solid #673ab7; }
-    .gf-input::placeholder { color: #bdc1c6; }
-
-    .gf-textarea {
-      width: 100%; padding: 8px 0; border: none;
-      border-bottom: 1px solid #dadce0; font-size: .9rem;
-      font-family: inherit; color: #202124; background: transparent;
-      outline: none; resize: vertical; min-height: 80px;
-      transition: border-color .2s;
-    }
-    .gf-textarea:focus { border-bottom: 2px solid #673ab7; }
-
-    /* Admin text inputs (boxed) */
-    .gf-input-box {
-      width: 100%; padding: 10px 12px;
-      border: 1px solid #dadce0; border-radius: 4px;
-      font-size: .9rem; font-family: inherit; color: #202124;
-      outline: none; transition: border-color .2s;
-    }
-    .gf-input-box:focus { border-color: #673ab7; box-shadow: 0 0 0 2px rgba(103,58,183,.15); }
-
-    /* Star rating */
-    .gf-stars { display: flex; gap: 4px; margin-top: 8px; }
-    .gf-stars input { display: none; }
-    .gf-stars label {
-      font-size: 2.2rem; cursor: pointer; color: #dadce0;
-      transition: color .1s; font-weight: 400; line-height: 1;
-    }
-    .gf-stars:hover label { color: #f59e0b; }
-    .gf-stars label:hover ~ label { color: #dadce0; }
-    .gf-stars input:checked ~ label { color: #dadce0; }
-    .gf-stars input:checked + label,
-    .gf-stars input:checked ~ label:not(input:checked ~ label ~ label) { color: #f59e0b; }
-    /* simpler approach */
-    .star-group { display: flex; flex-direction: row-reverse; gap: 4px; margin-top:8px; }
+    /* ── Stars ── */
+    .star-group { display: flex; flex-direction: row-reverse; gap: 6px; margin-top: 10px; }
     .star-group input { display: none; }
-    .star-group label { font-size: 2.2rem; cursor: pointer; color: #dadce0; transition: color .1s; }
+    .star-group label {
+      font-size: 2rem; cursor: pointer; color: var(--border2);
+      transition: color .12s; line-height: 1;
+    }
     .star-group label:hover,
     .star-group label:hover ~ label,
-    .star-group input:checked ~ label { color: #f59e0b; }
+    .star-group input:checked ~ label { color: var(--gold); }
 
-    /* Buttons */
-    .gf-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 10px 24px; border-radius: 4px; border: none;
-      cursor: pointer; font-size: .875rem; font-weight: 500;
-      font-family: inherit; text-decoration: none;
-      transition: background .15s, box-shadow .15s;
+    /* ── Inputs ── */
+    .gf-input {
+      width: 100%; padding: 10px 0; background: transparent;
+      border: none; border-bottom: 1px solid var(--border2);
+      font-size: .9rem; font-family: inherit; color: var(--text);
+      outline: none; transition: border-color .2s;
     }
-    .gf-btn-primary { background: #673ab7; color: #fff; }
-    .gf-btn-primary:hover { background: #5e35b1; box-shadow: 0 2px 6px rgba(103,58,183,.35); }
-    .gf-btn-text { background: transparent; color: #673ab7; padding: 10px 16px; }
-    .gf-btn-text:hover { background: rgba(103,58,183,.06); }
-    .gf-btn-danger { background: transparent; color: #d93025; padding: 8px 14px; }
-    .gf-btn-danger:hover { background: rgba(217,48,37,.06); }
-    .gf-btn-outlined {
-      background: transparent; color: #673ab7;
-      border: 1px solid #673ab7; padding: 9px 23px;
+    .gf-input:focus { border-bottom-color: var(--gold); }
+    .gf-input::placeholder { color: var(--muted); }
+
+    .input-box {
+      width: 100%; padding: 10px 14px;
+      background: var(--bg3); border: 1px solid var(--border);
+      font-size: .88rem; font-family: inherit; color: var(--text);
+      outline: none; transition: border-color .2s; border-radius: 1px;
     }
-    .gf-btn-outlined:hover { background: rgba(103,58,183,.06); }
-    .gf-btn-grey { background: #f1f3f4; color: #5f6368; }
-    .gf-btn-grey:hover { background: #e8eaed; }
+    .input-box:focus { border-color: var(--gold); }
+    .input-box::placeholder { color: var(--muted); }
 
-    /* Chips/badges */
-    .gf-chip {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 4px 12px; border-radius: 16px; font-size: .78rem; font-weight: 500;
+    textarea.input-box { resize: vertical; min-height: 80px; }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 28px; font-size: .78rem; font-weight: 600;
+      letter-spacing: .12em; text-transform: uppercase;
+      font-family: inherit; cursor: pointer; text-decoration: none;
+      transition: all .2s; border-radius: 1px; border: none;
     }
-    .gf-chip-green { background: #e6f4ea; color: #137333; }
-    .gf-chip-red { background: #fce8e6; color: #c5221f; }
-    .gf-chip-blue { background: #e8f0fe; color: #1967d2; }
-    .gf-chip-purple { background: #f3e8fd; color: #7b1fa2; }
+    .btn-gold {
+      background: var(--gold); color: var(--bg);
+    }
+    .btn-gold:hover { background: var(--gold2); }
+    .btn-outline {
+      background: transparent; color: var(--gold);
+      border: 1px solid var(--gold);
+    }
+    .btn-outline:hover { background: rgba(201,169,110,.08); }
+    .btn-ghost {
+      background: transparent; color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { color: var(--text); border-color: var(--border2); }
+    .btn-danger-ghost {
+      background: transparent; color: var(--danger);
+      border: none; padding: 10px 16px;
+    }
+    .btn-danger-ghost:hover { background: rgba(192,57,43,.08); }
+    .btn-text {
+      background: transparent; color: var(--muted); border: none;
+      padding: 10px 16px; letter-spacing: .08em;
+    }
+    .btn-text:hover { color: var(--text); }
 
-    /* Divider */
-    .gf-divider { height: 1px; background: #e0e0e0; margin: 16px 0; }
+    /* ── Tags / chips ── */
+    .tag {
+      display: inline-flex; align-items: center;
+      padding: 3px 10px; font-size: .68rem;
+      font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+      border-radius: 1px;
+    }
+    .tag-gold { background: rgba(201,169,110,.12); color: var(--gold); border: 1px solid rgba(201,169,110,.25); }
+    .tag-green { background: rgba(34,197,94,.08); color: #4ade80; border: 1px solid rgba(34,197,94,.2); }
+    .tag-red { background: rgba(192,57,43,.08); color: #f87171; border: 1px solid rgba(192,57,43,.2); }
+    .tag-blue { background: rgba(99,102,241,.08); color: #818cf8; border: 1px solid rgba(99,102,241,.2); }
+    .tag-purple { background: rgba(168,85,247,.08); color: #c084fc; border: 1px solid rgba(168,85,247,.2); }
 
-    /* Error */
-    .gf-error { color: #d93025; font-size: .8rem; margin-top: 4px; }
-    .gf-alert { padding: 12px 16px; border-radius: 4px; font-size: .9rem; margin-bottom: 16px; }
-    .gf-alert-error { background: #fce8e6; color: #c5221f; border-left: 4px solid #d93025; }
+    /* ── Divider ── */
+    .divider { height: 1px; background: var(--border); margin: 24px 0; }
 
-    /* Tooltip / hint */
-    .gf-hint { font-size: .8rem; color: #80868b; margin-top: 4px; }
-
-    /* Icon button */
+    /* ── Icon btn ── */
     .icon-btn {
-      width: 40px; height: 40px; border-radius: 50%; border: none;
+      width: 36px; height: 36px; border: 1px solid var(--border);
       background: transparent; cursor: pointer; display: flex;
       align-items: center; justify-content: center;
-      color: #5f6368; font-size: 1.1rem; transition: background .15s;
+      color: var(--muted); font-size: .9rem;
+      transition: all .15s; border-radius: 1px;
     }
-    .icon-btn:hover { background: #f1f3f4; }
+    .icon-btn:hover { border-color: var(--border2); color: var(--text); }
+    .icon-btn.danger:hover { border-color: var(--danger); color: var(--danger); }
 
-    /* Progress bar (for survey) */
-    .gf-progress { height: 4px; background: #e0e0e0; border-radius: 2px; margin-bottom: 20px; overflow: hidden; }
-    .gf-progress-fill { height: 100%; background: #673ab7; border-radius: 2px; transition: width .4s; }
+    /* ── Sub-question ── */
+    .sub-block {
+      display: none; margin: 10px 0 0 24px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-left: 2px solid var(--gold); padding: 20px 24px;
+    }
+    .sub-block.visible { display: block; }
+    .sub-trigger-label {
+      font-size: .65rem; font-weight: 600; letter-spacing: .15em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
 
-    /* Floating submit row */
-    .gf-submit-row { display: flex; align-items: center; gap: 12px; padding: 8px 0 16px; }
+    /* ── Alert ── */
+    .alert {
+      padding: 12px 16px; font-size: .85rem; margin-bottom: 16px;
+      border-left: 3px solid;
+    }
+    .alert-error { background: rgba(192,57,43,.08); border-color: var(--danger); color: #f87171; }
   </style>
   {% block head %}{% endblock %}
 </head>
 <body>
-  <nav class="gf-topbar">
-    <a href="/" class="logo">
-      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="6" y="4" width="36" height="40" rx="4" fill="#673ab7"/>
-        <rect x="12" y="14" width="24" height="3" rx="1.5" fill="white" opacity=".9"/>
-        <rect x="12" y="21" width="24" height="3" rx="1.5" fill="white" opacity=".9"/>
-        <rect x="12" y="28" width="16" height="3" rx="1.5" fill="white" opacity=".9"/>
-      </svg>
-      <span class="logo-text">Судалгаа</span>
+  <nav class="topbar">
+    <a href="/" class="topbar-logo">
+      <div class="topbar-logo-icon">S</div>
+      <span class="topbar-logo-text">Судалгаа</span>
     </a>
-    <div class="spacer"></div>
+    <div class="topbar-spacer"></div>
     {% block topbar_actions %}
-    <a href="/" class="nav-btn">Нүүр</a>
-    <a href="/admin" class="nav-btn primary">Админ</a>
+    <a href="/" class="topbar-link">Нүүр</a>
+    <a href="/admin" class="topbar-link active">Админ</a>
     {% endblock %}
   </nav>
   {% block body %}
-  <div class="gf-page">
+  <div class="page">
     {% block content %}{% endblock %}
   </div>
   {% endblock %}

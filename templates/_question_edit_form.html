@@ -1,9 +1,9 @@
 <div style="margin-bottom:14px;">
-  <label style="font-size:.8rem;color:#5f6368;display:block;margin-bottom:4px;">Асуулт</label>
-  <input type="text" class="gf-input-box eq-text" id="eqtext_{{ q.id }}" value="{{ q.text }}" placeholder="Асуулт">
+  <label class="edit-label">Асуулт</label>
+  <input type="text" class="input-box eq-text" id="eqtext_{{ q.id }}" value="{{ q.text }}" placeholder="Асуулт">
 </div>
 <div style="margin-bottom:14px;">
-  <label style="font-size:.8rem;color:#5f6368;display:block;margin-bottom:6px;">Төрөл</label>
+  <label class="edit-label">Төрөл</label>
   <div class="type-grid" id="etypegrid_{{ q.id }}">
     <div class="type-opt {% if q.question_type=='single' %}selected{% endif %}" data-val="single" onclick="selectEditType({{ q.id }},'single')">⦿ Нэг сонголт</div>
     <div class="type-opt {% if q.question_type=='multiple' %}selected{% endif %}" data-val="multiple" onclick="selectEditType({{ q.id }},'multiple')">☑ Олон сонголт</div>
@@ -12,21 +12,21 @@
   </div>
 </div>
 <div id="eoptSection_{{ q.id }}" style="margin-bottom:14px;{% if q.question_type in ('rating','text') %}display:none{% endif %}">
-  <label style="font-size:.8rem;color:#5f6368;display:block;margin-bottom:6px;">Сонголтууд</label>
+  <label class="edit-label">Сонголтууд</label>
   <div id="eoptList_{{ q.id }}">
     {% for opt in q.get_options() %}
     <div class="opt-row">
-      <span style="color:#80868b;font-size:.9rem;">○</span>
-      <input type="text" class="gf-input-box eq-opt" value="{{ opt }}" style="padding:8px 10px;">
+      <span style="color:var(--gold);font-size:.8rem;">—</span>
+      <input type="text" class="input-box eq-opt" value="{{ opt }}" style="padding:7px 12px;">
       <button class="opt-del" onclick="this.closest('.opt-row').remove()">×</button>
     </div>
     {% endfor %}
   </div>
-  <button class="gf-btn gf-btn-text" style="padding:6px 10px;font-size:.8rem;margin-top:4px;" onclick="addEditOpt({{ q.id }})">+ Нэмэх</button>
+  <button class="btn btn-text" style="padding:6px 0;font-size:.72rem;margin-top:4px;" onclick="addEditOpt({{ q.id }})">+ Нэмэх</button>
 </div>
-<div style="display:flex;gap:10px;align-items:center;">
-  <button class="gf-btn gf-btn-primary" style="font-size:.85rem;padding:9px 18px;" onclick="saveQ({{ q.id }})">Хадгалах</button>
-  <button class="gf-btn gf-btn-text" style="font-size:.85rem;" onclick="cancelEdit({{ q.id }})">Цуцлах</button>
+<div style="display:flex;gap:10px;align-items:center;margin-top:16px;">
+  <button class="btn btn-gold" style="padding:9px 20px;font-size:.72rem;" onclick="saveQ({{ q.id }})">Хадгалах</button>
+  <button class="btn btn-ghost" style="padding:9px 16px;font-size:.72rem;" onclick="cancelEdit({{ q.id }})">Цуцлах</button>
   <div style="flex:1;"></div>
-  <button class="icon-btn" onclick="deleteQ({{ q.id }},event)" style="color:#d93025;">🗑</button>
+  <button class="icon-btn danger" onclick="deleteQ({{ q.id }},event)" title="Устгах">✕</button>
 </div>
