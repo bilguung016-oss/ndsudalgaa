@@ -1,0 +1,32 @@
+<div style="margin-bottom:14px;">
+  <label style="font-size:.8rem;color:#5f6368;display:block;margin-bottom:4px;">Асуулт</label>
+  <input type="text" class="gf-input-box eq-text" id="eqtext_{{ q.id }}" value="{{ q.text }}" placeholder="Асуулт">
+</div>
+<div style="margin-bottom:14px;">
+  <label style="font-size:.8rem;color:#5f6368;display:block;margin-bottom:6px;">Төрөл</label>
+  <div class="type-grid" id="etypegrid_{{ q.id }}">
+    <div class="type-opt {% if q.question_type=='single' %}selected{% endif %}" data-val="single" onclick="selectEditType({{ q.id }},'single')">⦿ Нэг сонголт</div>
+    <div class="type-opt {% if q.question_type=='multiple' %}selected{% endif %}" data-val="multiple" onclick="selectEditType({{ q.id }},'multiple')">☑ Олон сонголт</div>
+    <div class="type-opt {% if q.question_type=='rating' %}selected{% endif %}" data-val="rating" onclick="selectEditType({{ q.id }},'rating')">★ Үнэлгээ</div>
+    <div class="type-opt {% if q.question_type=='text' %}selected{% endif %}" data-val="text" onclick="selectEditType({{ q.id }},'text')">✏ Текст</div>
+  </div>
+</div>
+<div id="eoptSection_{{ q.id }}" style="margin-bottom:14px;{% if q.question_type in ('rating','text') %}display:none{% endif %}">
+  <label style="font-size:.8rem;color:#5f6368;display:block;margin-bottom:6px;">Сонголтууд</label>
+  <div id="eoptList_{{ q.id }}">
+    {% for opt in q.get_options() %}
+    <div class="opt-row">
+      <span style="color:#80868b;font-size:.9rem;">○</span>
+      <input type="text" class="gf-input-box eq-opt" value="{{ opt }}" style="padding:8px 10px;">
+      <button class="opt-del" onclick="this.closest('.opt-row').remove()">×</button>
+    </div>
+    {% endfor %}
+  </div>
+  <button class="gf-btn gf-btn-text" style="padding:6px 10px;font-size:.8rem;margin-top:4px;" onclick="addEditOpt({{ q.id }})">+ Нэмэх</button>
+</div>
+<div style="display:flex;gap:10px;align-items:center;">
+  <button class="gf-btn gf-btn-primary" style="font-size:.85rem;padding:9px 18px;" onclick="saveQ({{ q.id }})">Хадгалах</button>
+  <button class="gf-btn gf-btn-text" style="font-size:.85rem;" onclick="cancelEdit({{ q.id }})">Цуцлах</button>
+  <div style="flex:1;"></div>
+  <button class="icon-btn" onclick="deleteQ({{ q.id }},event)" style="color:#d93025;">🗑</button>
+</div>

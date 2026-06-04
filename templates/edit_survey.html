@@ -7,51 +7,71 @@
 {% endblock %}
 {% block head %}
 <style>
-  /* Question card */
   .q-card {
-    background:#fff; border-radius:8px; padding:20px 24px;
+    background:#fff; border-radius:8px; padding:18px 22px;
     box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);
-    margin-bottom:10px; border-left:4px solid transparent;
-    transition:box-shadow .15s, border-color .2s;
-    cursor:pointer;
+    margin-bottom:8px; border-left:4px solid transparent;
+    transition:box-shadow .15s, border-color .2s; cursor:pointer;
   }
   .q-card:hover { box-shadow:0 4px 8px rgba(0,0,0,.12); border-left-color:#e8eaed; }
   .q-card.editing { border-left-color:#673ab7; cursor:default; }
 
-  /* View mode */
-  .q-view { display:flex; align-items:center; gap:12px; }
-  .q-num { font-size:.8rem; color:#80868b; min-width:20px; flex-shrink:0; }
+  /* Sub-question card */
+  .sub-card {
+    background:#faf7ff; border-radius:8px; padding:14px 18px;
+    border-left:3px solid #673ab7; margin:8px 0 0 28px;
+    box-shadow:0 1px 3px rgba(103,58,183,.1);
+    display:flex; align-items:center; gap:10px; cursor:pointer;
+  }
+  .sub-card:hover { box-shadow:0 2px 6px rgba(103,58,183,.18); }
+  .sub-card.editing { background:#f3e8fd; cursor:default; }
+  .sub-trigger-tag {
+    font-size:.72rem; background:#ede7f6; color:#512da8;
+    border-radius:12px; padding:2px 8px; white-space:nowrap;
+    font-weight:500;
+  }
+
+  /* View row */
+  .q-view { display:flex; align-items:center; gap:10px; }
+  .q-num { font-size:.78rem; color:#80868b; min-width:18px; flex-shrink:0; }
   .q-text-label { flex:1; font-size:.9rem; color:#202124; }
   .q-actions { display:flex; gap:4px; opacity:0; transition:opacity .15s; }
-  .q-card:hover .q-actions { opacity:1; }
+  .q-card:hover .q-actions,
+  .sub-card:hover .q-actions { opacity:1; }
 
-  /* Edit mode */
+  /* Edit panel */
   .q-edit { display:none; }
-  .q-card.editing .q-view { display:none; }
-  .q-card.editing .q-edit { display:block; }
+  .q-card.editing .q-view,
+  .sub-card.editing .q-view { display:none; }
+  .q-card.editing .q-edit,
+  .sub-card.editing .q-edit { display:block; }
 
-  /* Add panel */
-  .add-panel {
-    background:#fff; border-radius:8px;
-    box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);
-    margin-top:12px; overflow:hidden;
+  /* Add sub-question button row */
+  .add-sub-row {
+    margin: 6px 0 0 28px;
+    display:flex; flex-wrap:wrap; gap:6px;
   }
-  .add-panel-header {
-    padding:16px 24px; cursor:pointer;
-    display:flex; align-items:center; gap:10px;
-    font-size:.9rem; font-weight:500; color:#673ab7;
-    transition:background .15s;
+  .add-sub-btn {
+    font-size:.78rem; color:#673ab7; background:#ede7f6;
+    border:none; border-radius:12px; padding:4px 12px;
+    cursor:pointer; font-family:inherit; transition:background .12s;
   }
-  .add-panel-header:hover { background:#f3e8fd; }
-  .add-panel-body { display:none; padding:24px; border-top:1px solid #e8eaed; }
-  .add-panel-body.open { display:block; }
+  .add-sub-btn:hover { background:#d1c4e9; }
+
+  /* Sub add panel */
+  .sub-add-panel {
+    display:none; margin:8px 0 0 28px;
+    background:#faf7ff; border:1.5px solid #d1c4e9;
+    border-radius:8px; padding:18px 20px;
+  }
+  .sub-add-panel.open { display:block; }
 
   /* Type grid */
-  .type-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:20px; }
+  .type-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:16px; }
   .type-opt {
-    border:1.5px solid #e8eaed; border-radius:6px; padding:10px 14px;
-    cursor:pointer; font-size:.85rem; color:#5f6368;
-    display:flex; align-items:center; gap:8px; transition:all .15s;
+    border:1.5px solid #e8eaed; border-radius:6px; padding:9px 12px;
+    cursor:pointer; font-size:.82rem; color:#5f6368;
+    display:flex; align-items:center; gap:6px; transition:all .15s;
   }
   .type-opt:hover { border-color:#673ab7; color:#673ab7; background:#f3e8fd; }
   .type-opt.selected { border-color:#673ab7; color:#673ab7; background:#f3e8fd; font-weight:500; }
@@ -60,10 +80,10 @@
   .opt-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
   .opt-row input { flex:1; }
   .opt-del {
-    width:32px; height:32px; border-radius:50%; border:none;
+    width:30px; height:30px; border-radius:50%; border:none;
     background:transparent; cursor:pointer; color:#80868b;
-    font-size:1.1rem; display:flex; align-items:center;
-    justify-content:center; transition:background .12s; flex-shrink:0;
+    font-size:1rem; display:flex; align-items:center; justify-content:center;
+    transition:background .12s; flex-shrink:0;
   }
   .opt-del:hover { background:#fce8e6; color:#d93025; }
 
@@ -71,30 +91,41 @@
   .header-title {
     font-size:1.6rem; font-weight:400; color:#202124;
     border:none; outline:none; width:100%;
-    border-bottom:2px solid transparent;
-    background:transparent; font-family:inherit;
-    padding:2px 0; transition:border-color .2s;
+    border-bottom:2px solid transparent; background:transparent;
+    font-family:inherit; padding:2px 0; transition:border-color .2s;
   }
   .header-title:focus { border-bottom-color:#673ab7; }
   .header-desc {
     font-size:.9rem; color:#5f6368; border:none; outline:none;
     width:100%; border-bottom:1px solid transparent;
     background:transparent; font-family:inherit;
-    padding:2px 0; margin-top:6px; resize:none;
-    transition:border-color .2s;
+    padding:2px 0; margin-top:6px; resize:none; transition:border-color .2s;
   }
   .header-desc:focus { border-bottom-color:#673ab7; }
   .save-badge {
-    display:none; font-size:.75rem; color:#16a34a;
-    margin-left:8px; animation:fadein .3s;
+    display:none; font-size:.75rem; color:#16a34a; margin-left:8px;
   }
-  @keyframes fadein { from{opacity:0} to{opacity:1} }
+
+  /* Add question panel */
+  .add-panel {
+    background:#fff; border-radius:8px;
+    box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);
+    margin-top:12px; overflow:hidden;
+  }
+  .add-panel-header {
+    padding:16px 24px; cursor:pointer;
+    display:flex; align-items:center; gap:10px;
+    font-size:.9rem; font-weight:500; color:#673ab7; transition:background .15s;
+  }
+  .add-panel-header:hover { background:#f3e8fd; }
+  .add-panel-body { display:none; padding:24px; border-top:1px solid #e8eaed; }
+  .add-panel-body.open { display:block; }
 </style>
 {% endblock %}
 {% block body %}
 <div class="gf-page">
 
-  <!-- Header card — inline editable -->
+  <!-- Survey header — inline editable -->
   <div style="background:#fff; border-radius:8px; border-top:10px solid #673ab7;
     box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);
     padding:24px; margin-bottom:12px;">
@@ -104,8 +135,7 @@
           value="{{ survey.title }}" placeholder="Судалгааны гарчиг"
           oninput="scheduleHeaderSave()">
         <textarea class="header-desc" id="surveyDesc" rows="2"
-          placeholder="Тайлбар (заавал биш)"
-          oninput="scheduleHeaderSave()">{{ survey.description or '' }}</textarea>
+          placeholder="Тайлбар" oninput="scheduleHeaderSave()">{{ survey.description or '' }}</textarea>
       </div>
       <span class="save-badge" id="headerSaved">✓ Хадгалагдлаа</span>
     </div>
@@ -115,113 +145,127 @@
   <div id="qList">
     {% if questions %}
       {% for q in questions %}
-      <div class="q-card" id="qi_{{ q.id }}" onclick="startEdit({{ q.id }}, event)">
-
-        <!-- View mode -->
+      <!-- Main question -->
+      <div class="q-card" id="qi_{{ q.id }}" onclick="startEdit('q', {{ q.id }}, event)">
         <div class="q-view">
           <span class="q-num">{{ loop.index }}</span>
-          <span class="q-text-label">{{ q.text }}</span>
-          <span class="gf-chip {% if q.question_type == 'single' %}gf-chip-purple{% elif q.question_type == 'multiple' %}gf-chip-blue{% elif q.question_type == 'rating' %}gf-chip-green{% else %}gf-chip-red{% endif %}" style="font-size:.75rem;">
-            {% if q.question_type == 'single' %}⦿ Нэг сонголт
-            {% elif q.question_type == 'multiple' %}☑ Олон сонголт
-            {% elif q.question_type == 'rating' %}★ Үнэлгээ
-            {% else %}✏ Текст{% endif %}
+          <span class="q-text-label" id="qlabel_{{ q.id }}">{{ q.text }}</span>
+          <span class="gf-chip {{ 'gf-chip-purple' if q.question_type=='single' else 'gf-chip-blue' if q.question_type=='multiple' else 'gf-chip-green' if q.question_type=='rating' else 'gf-chip-red' }}" id="qchip_{{ q.id }}" style="font-size:.72rem;">
+            {{ '⦿ Нэг' if q.question_type=='single' else '☑ Олон' if q.question_type=='multiple' else '★ Үнэлгээ' if q.question_type=='rating' else '✏ Текст' }}
           </span>
           <div class="q-actions">
-            <button class="icon-btn" onclick="startEdit({{ q.id }}, event); event.stopPropagation();" title="Засах" style="font-size:.9rem;">✏️</button>
-            <button class="icon-btn" onclick="deleteQ({{ q.id }}, event)" title="Устгах" style="color:#80868b; font-size:.9rem;">🗑</button>
+            <button class="icon-btn" onclick="startEdit('q',{{ q.id }},event);event.stopPropagation();" style="font-size:.85rem;">✏️</button>
+            <button class="icon-btn" onclick="deleteQ({{ q.id }},event)" style="color:#80868b;font-size:.85rem;">🗑</button>
           </div>
         </div>
 
-        <!-- Edit mode -->
-        <div class="q-edit" id="qedit_{{ q.id }}" data-id="{{ q.id }}" data-type="{{ q.question_type }}">
-          <div style="margin-bottom:16px;">
-            <label style="font-size:.8rem; color:#5f6368; display:block; margin-bottom:4px;">Асуулт</label>
-            <input type="text" class="gf-input-box eq-text" id="eqtext_{{ q.id }}"
-              value="{{ q.text }}" placeholder="Асуулт">
-          </div>
+        <!-- Edit panel -->
+        <div class="q-edit" id="qedit_{{ q.id }}" data-type="{{ q.question_type }}">
+          {% include '_question_edit_form.html' with context %}
+        </div>
+      </div>
 
-          <div style="margin-bottom:16px;">
-            <label style="font-size:.8rem; color:#5f6368; display:block; margin-bottom:8px;">Төрөл</label>
-            <div class="type-grid" id="etypegrid_{{ q.id }}">
-              <div class="type-opt {% if q.question_type == 'single' %}selected{% endif %}" data-val="single" onclick="selectEditType({{ q.id }}, 'single')">⦿ Нэг сонголт</div>
-              <div class="type-opt {% if q.question_type == 'multiple' %}selected{% endif %}" data-val="multiple" onclick="selectEditType({{ q.id }}, 'multiple')">☑ Олон сонголт</div>
-              <div class="type-opt {% if q.question_type == 'rating' %}selected{% endif %}" data-val="rating" onclick="selectEditType({{ q.id }}, 'rating')">★ Үнэлгээ (1–5)</div>
-              <div class="type-opt {% if q.question_type == 'text' %}selected{% endif %}" data-val="text" onclick="selectEditType({{ q.id }}, 'text')">✏ Нээлттэй текст</div>
-            </div>
-          </div>
-
-          <div id="eoptSection_{{ q.id }}" style="margin-bottom:20px; {% if q.question_type in ('rating', 'text') %}display:none{% endif %}">
-            <label style="font-size:.8rem; color:#5f6368; display:block; margin-bottom:8px;">Сонголтууд</label>
-            <div id="eoptList_{{ q.id }}">
-              {% for opt in q.get_options() %}
-              <div class="opt-row">
-                <span style="color:#80868b; font-size:.9rem;">○</span>
-                <input type="text" class="gf-input-box eq-opt" value="{{ opt }}" style="padding:8px 10px;">
-                <button class="opt-del" onclick="this.closest('.opt-row').remove()">×</button>
-              </div>
-              {% endfor %}
-            </div>
-            <button class="gf-btn gf-btn-text" style="padding:6px 10px; font-size:.82rem; margin-top:4px;"
-              onclick="addEditOpt({{ q.id }})">+ Сонголт нэмэх</button>
-          </div>
-
-          <div style="display:flex; gap:10px; align-items:center;">
-            <button class="gf-btn gf-btn-primary" onclick="saveQ({{ q.id }})">Хадгалах</button>
-            <button class="gf-btn gf-btn-text" onclick="cancelEdit({{ q.id }})">Цуцлах</button>
-            <div style="flex:1;"></div>
-            <button class="icon-btn" onclick="deleteQ({{ q.id }}, event)" title="Устгах" style="color:#d93025;">🗑</button>
+      <!-- Sub-questions of this question -->
+      {% for sub in q.sub_questions %}
+      <div class="sub-card" id="qi_{{ sub.id }}" onclick="startEdit('sub', {{ sub.id }}, event)">
+        <div class="q-view" style="flex:1;">
+          <span style="color:#9c4dcc;font-size:.85rem;">↳</span>
+          <span class="sub-trigger-tag">"{{ sub.trigger_value }}" үед</span>
+          <span class="q-text-label" id="qlabel_{{ sub.id }}" style="font-size:.88rem;">{{ sub.text }}</span>
+          <span class="gf-chip {{ 'gf-chip-purple' if sub.question_type=='single' else 'gf-chip-blue' if sub.question_type=='multiple' else 'gf-chip-green' if sub.question_type=='rating' else 'gf-chip-red' }}" id="qchip_{{ sub.id }}" style="font-size:.7rem;">
+            {{ '⦿ Нэг' if sub.question_type=='single' else '☑ Олон' if sub.question_type=='multiple' else '★ Үнэлгээ' if sub.question_type=='rating' else '✏ Текст' }}
+          </span>
+          <div class="q-actions">
+            <button class="icon-btn" onclick="startEdit('sub',{{ sub.id }},event);event.stopPropagation();" style="font-size:.85rem;">✏️</button>
+            <button class="icon-btn" onclick="deleteQ({{ sub.id }},event)" style="color:#80868b;font-size:.85rem;">🗑</button>
           </div>
         </div>
-
+        <div class="q-edit" id="qedit_{{ sub.id }}" data-type="{{ sub.question_type }}">
+          {% set q = sub %}{% include '_question_edit_form.html' with context %}
+        </div>
       </div>
       {% endfor %}
+
+      <!-- Add sub-question buttons (one per option) -->
+      {% if q.question_type in ('single', 'multiple') %}
+      <div class="add-sub-row" id="subrow_{{ q.id }}">
+        <span style="font-size:.75rem;color:#80868b;align-self:center;">Дэд асуулт нэмэх:</span>
+        {% for opt in q.get_options() %}
+        <button class="add-sub-btn" onclick="openSubPanel({{ q.id }}, '{{ opt }}')">
+          + "{{ opt }}"
+        </button>
+        {% endfor %}
+      </div>
+      <div class="sub-add-panel" id="subpanel_{{ q.id }}">
+        <div style="font-size:.82rem;font-weight:500;color:#512da8;margin-bottom:14px;" id="subpanel_title_{{ q.id }}"></div>
+        <input type="hidden" id="subpanel_trigger_{{ q.id }}">
+        <div style="margin-bottom:14px;">
+          <label style="font-size:.82rem;color:#5f6368;display:block;margin-bottom:4px;">Дэд асуулт</label>
+          <input type="text" class="gf-input-box" id="subtext_{{ q.id }}" placeholder="Дэд асуулт...">
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:.82rem;color:#5f6368;display:block;margin-bottom:6px;">Төрөл</label>
+          <div class="type-grid" id="subtypegrid_{{ q.id }}">
+            <div class="type-opt selected" data-val="single" onclick="selectSubType({{ q.id }},'single')">⦿ Нэг сонголт</div>
+            <div class="type-opt" data-val="multiple" onclick="selectSubType({{ q.id }},'multiple')">☑ Олон сонголт</div>
+            <div class="type-opt" data-val="rating" onclick="selectSubType({{ q.id }},'rating')">★ Үнэлгээ</div>
+            <div class="type-opt" data-val="text" onclick="selectSubType({{ q.id }},'text')">✏ Текст</div>
+          </div>
+        </div>
+        <div id="suboptSection_{{ q.id }}" style="margin-bottom:14px;">
+          <label style="font-size:.82rem;color:#5f6368;display:block;margin-bottom:6px;">Сонголтууд</label>
+          <div id="suboptList_{{ q.id }}">
+            <div class="opt-row"><span style="color:#80868b;font-size:.85rem;">○</span><input type="text" class="gf-input-box" placeholder="Сонголт 1" style="padding:7px 10px;"><button class="opt-del" onclick="this.closest('.opt-row').remove()">×</button></div>
+            <div class="opt-row"><span style="color:#80868b;font-size:.85rem;">○</span><input type="text" class="gf-input-box" placeholder="Сонголт 2" style="padding:7px 10px;"><button class="opt-del" onclick="this.closest('.opt-row').remove()">×</button></div>
+          </div>
+          <button class="gf-btn gf-btn-text" style="padding:5px 10px;font-size:.78rem;margin-top:4px;" onclick="addSubOpt({{ q.id }})">+ Нэмэх</button>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="gf-btn gf-btn-primary" style="font-size:.85rem;padding:9px 18px;" onclick="saveSubQ({{ q.id }})">Нэмэх</button>
+          <button class="gf-btn gf-btn-text" style="font-size:.85rem;" onclick="closeSubPanel({{ q.id }})">Цуцлах</button>
+        </div>
+      </div>
+      {% endif %}
+
+      {% endfor %}
     {% else %}
-      <div id="emptyState" style="text-align:center; padding:48px; background:#fff; border-radius:8px;
+      <div id="emptyState" style="text-align:center;padding:48px;background:#fff;border-radius:8px;
         box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);
-        color:#80868b; font-size:.9rem;">
+        color:#80868b;font-size:.9rem;">
         Асуулт байхгүй байна. Доорх товчоор нэмнэ үү.
       </div>
     {% endif %}
   </div>
 
-  <!-- Add question panel -->
+  <!-- Add main question panel -->
   <div class="add-panel">
     <div class="add-panel-header" onclick="togglePanel()">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="#673ab7"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-      Асуулт нэмэх
+      Үндсэн асуулт нэмэх
     </div>
     <div class="add-panel-body" id="addPanel">
-      <div style="margin-bottom:18px;">
-        <label style="font-size:.85rem; color:#5f6368; display:block; margin-bottom:6px;">Асуулт</label>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:.85rem;color:#5f6368;display:block;margin-bottom:6px;">Асуулт</label>
         <input type="text" id="qText" class="gf-input-box" placeholder="Асуултаа оруулна уу...">
       </div>
-      <div style="margin-bottom:18px;">
-        <label style="font-size:.85rem; color:#5f6368; display:block; margin-bottom:8px;">Асуултын төрөл</label>
-        <div class="type-grid">
-          <div class="type-opt selected" data-val="single" onclick="selectType('single')">⦿ Нэг сонголт</div>
-          <div class="type-opt" data-val="multiple" onclick="selectType('multiple')">☑ Олон сонголт</div>
-          <div class="type-opt" data-val="rating" onclick="selectType('rating')">★ Үнэлгээ (1–5)</div>
-          <div class="type-opt" data-val="text" onclick="selectType('text')">✏ Нээлттэй текст</div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:.85rem;color:#5f6368;display:block;margin-bottom:8px;">Төрөл</label>
+        <div class="type-grid" id="maintypegrid">
+          <div class="type-opt selected" data-val="single" onclick="selectMainType('single')">⦿ Нэг сонголт</div>
+          <div class="type-opt" data-val="multiple" onclick="selectMainType('multiple')">☑ Олон сонголт</div>
+          <div class="type-opt" data-val="rating" onclick="selectMainType('rating')">★ Үнэлгээ (1–5)</div>
+          <div class="type-opt" data-val="text" onclick="selectMainType('text')">✏ Нээлттэй текст</div>
         </div>
       </div>
-      <div id="optSection" style="margin-bottom:20px;">
-        <label style="font-size:.85rem; color:#5f6368; display:block; margin-bottom:8px;">Сонголтууд</label>
-        <div id="optList">
-          <div class="opt-row">
-            <span style="color:#80868b; font-size:.9rem;">○</span>
-            <input type="text" class="gf-input-box opt-input" placeholder="Сонголт 1" style="padding:8px 10px;">
-            <button class="opt-del" onclick="delOpt(this)">×</button>
-          </div>
-          <div class="opt-row">
-            <span style="color:#80868b; font-size:.9rem;">○</span>
-            <input type="text" class="gf-input-box opt-input" placeholder="Сонголт 2" style="padding:8px 10px;">
-            <button class="opt-del" onclick="delOpt(this)">×</button>
-          </div>
+      <div id="mainoptSection" style="margin-bottom:16px;">
+        <label style="font-size:.85rem;color:#5f6368;display:block;margin-bottom:8px;">Сонголтууд</label>
+        <div id="mainoptList">
+          <div class="opt-row"><span style="color:#80868b;font-size:.9rem;">○</span><input type="text" class="gf-input-box opt-input" placeholder="Сонголт 1" style="padding:8px 10px;"><button class="opt-del" onclick="delOpt(this)">×</button></div>
+          <div class="opt-row"><span style="color:#80868b;font-size:.9rem;">○</span><input type="text" class="gf-input-box opt-input" placeholder="Сонголт 2" style="padding:8px 10px;"><button class="opt-del" onclick="delOpt(this)">×</button></div>
         </div>
-        <button class="gf-btn gf-btn-text" style="padding:6px 10px; font-size:.82rem; margin-top:4px;" onclick="addOpt()">+ Сонголт нэмэх</button>
+        <button class="gf-btn gf-btn-text" style="padding:6px 10px;font-size:.82rem;margin-top:4px;" onclick="addOpt()">+ Сонголт нэмэх</button>
       </div>
-      <div style="display:flex; gap:10px;">
+      <div style="display:flex;gap:10px;">
         <button class="gf-btn gf-btn-primary" onclick="addNewQ()">Нэмэх</button>
         <button class="gf-btn gf-btn-text" onclick="togglePanel()">Цуцлах</button>
       </div>
@@ -232,212 +276,280 @@
 
 <script>
 const surveyId = {{ survey.id }};
-let selectedType = 'single';
-let qCount = {{ questions|length }};
+let mainType = 'single';
+let subTypes = {};
+let editTypes = {};
 let headerTimer = null;
-let editTypes = {};  // qId -> current type in edit mode
 
-// ── Header auto-save ──────────────────────────────────────────
+// ── Header ────────────────────────────────────────────────────
 function scheduleHeaderSave() {
   clearTimeout(headerTimer);
-  headerTimer = setTimeout(saveHeader, 900);
-}
-async function saveHeader() {
-  const title = document.getElementById('surveyTitle').value.trim();
-  if (!title) return;
-  await fetch(`/admin/survey/${surveyId}/update`, {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({title, description: document.getElementById('surveyDesc').value})
-  });
-  const badge = document.getElementById('headerSaved');
-  badge.style.display = 'inline';
-  setTimeout(() => badge.style.display = 'none', 2000);
+  headerTimer = setTimeout(async () => {
+    const title = document.getElementById('surveyTitle').value.trim();
+    if (!title) return;
+    await fetch(`/admin/survey/${surveyId}/update`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({title, description: document.getElementById('surveyDesc').value})
+    });
+    const b = document.getElementById('headerSaved');
+    b.style.display = 'inline'; setTimeout(()=>b.style.display='none', 2000);
+  }, 900);
 }
 
 // ── Edit existing question ────────────────────────────────────
-function startEdit(id, e) {
-  if (e && e.target.closest('.opt-del, .icon-btn, button')) return;
-  // close any other open edit
-  document.querySelectorAll('.q-card.editing').forEach(c => {
-    if (c.id !== `qi_${id}`) cancelEditById(c.id.replace('qi_', ''));
+function startEdit(kind, id, e) {
+  if (e?.target.closest('.opt-del,.icon-btn,button')) return;
+  document.querySelectorAll('.q-card.editing,.sub-card.editing').forEach(c => {
+    if (c.id !== `qi_${id}`) cancelEditById(c.id.replace('qi_',''));
   });
-  const card = document.getElementById(`qi_${id}`);
-  card.classList.add('editing');
-  editTypes[id] = document.getElementById(`qedit_${id}`).dataset.type;
+  document.getElementById(`qi_${id}`)?.classList.add('editing');
+  editTypes[id] = document.getElementById(`qedit_${id}`)?.dataset.type || 'single';
 }
-
 function cancelEdit(id) { cancelEditById(id); }
 function cancelEditById(id) {
   document.getElementById(`qi_${id}`)?.classList.remove('editing');
 }
-
 function selectEditType(id, t) {
   editTypes[id] = t;
-  document.querySelectorAll(`#etypegrid_${id} .type-opt`).forEach(el => {
-    el.classList.toggle('selected', el.dataset.val === t);
-  });
-  document.getElementById(`eoptSection_${id}`).style.display =
-    (t === 'rating' || t === 'text') ? 'none' : 'block';
+  document.querySelectorAll(`#etypegrid_${id} .type-opt`).forEach(el=>el.classList.toggle('selected',el.dataset.val===t));
+  document.getElementById(`eoptSection_${id}`).style.display=(t==='rating'||t==='text')?'none':'block';
 }
-
 function addEditOpt(id) {
   const list = document.getElementById(`eoptList_${id}`);
-  const n = list.children.length + 1;
-  const row = document.createElement('div');
-  row.className = 'opt-row';
-  row.innerHTML = `<span style="color:#80868b;font-size:.9rem;">○</span>
-    <input type="text" class="gf-input-box eq-opt" placeholder="Сонголт ${n}" style="padding:8px 10px;">
-    <button class="opt-del" onclick="this.closest('.opt-row').remove()">×</button>`;
+  const n = list.children.length+1;
+  const row = document.createElement('div'); row.className='opt-row';
+  row.innerHTML=`<span style="color:#80868b;font-size:.9rem;">○</span><input type="text" class="gf-input-box eq-opt" placeholder="Сонголт ${n}" style="padding:8px 10px;"><button class="opt-del" onclick="this.closest('.opt-row').remove()">×</button>`;
   list.appendChild(row);
 }
-
 async function saveQ(id) {
   const text = document.getElementById(`eqtext_${id}`).value.trim();
   if (!text) { document.getElementById(`eqtext_${id}`).focus(); return; }
-  const type = editTypes[id] || 'single';
-
-  let options = [];
-  if (type === 'single' || type === 'multiple') {
-    options = Array.from(document.querySelectorAll(`#eoptList_${id} .eq-opt`))
-      .map(i => i.value.trim()).filter(v => v);
-    if (options.length < 2) { alert('Хамгийн багадаа 2 сонголт оруулна уу'); return; }
+  const type = editTypes[id]||'single';
+  let options=[];
+  if(type==='single'||type==='multiple'){
+    options=Array.from(document.querySelectorAll(`#eoptList_${id} .eq-opt`)).map(i=>i.value.trim()).filter(v=>v);
+    if(options.length<2){alert('Хамгийн багадаа 2 сонголт оруулна уу');return;}
   }
-
-  await fetch(`/admin/question/${id}/update`, {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({text, type, options})
-  });
-
-  // Update view label
-  const card = document.getElementById(`qi_${id}`);
-  card.querySelector('.q-text-label').textContent = text;
-  const chipLabels = {single:'⦿ Нэг сонголт', multiple:'☑ Олон сонголт', rating:'★ Үнэлгээ', text:'✏ Текст'};
-  const chipClasses = {single:'gf-chip-purple', multiple:'gf-chip-blue', rating:'gf-chip-green', text:'gf-chip-red'};
-  const chip = card.querySelector('.gf-chip');
-  chip.textContent = chipLabels[type];
-  chip.className = `gf-chip ${chipClasses[type]}`;
-  chip.style.fontSize = '.75rem';
-  card.querySelector('.q-edit').dataset.type = type;
-  editTypes[id] = type;
-
+  await fetch(`/admin/question/${id}/update`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,type,options})});
+  document.getElementById(`qlabel_${id}`).textContent=text;
+  const chipL={single:'⦿ Нэг',multiple:'☑ Олон',rating:'★ Үнэлгээ',text:'✏ Текст'};
+  const chipC={single:'gf-chip-purple',multiple:'gf-chip-blue',rating:'gf-chip-green',text:'gf-chip-red'};
+  const chip=document.getElementById(`qchip_${id}`);
+  chip.textContent=chipL[type]; chip.className=`gf-chip ${chipC[type]}`; chip.style.fontSize='.72rem';
+  document.getElementById(`qedit_${id}`).dataset.type=type;
   cancelEditById(id);
 }
-
-// ── Delete question ───────────────────────────────────────────
-async function deleteQ(id, e) {
-  if (e) e.stopPropagation();
-  if (!confirm('Устгахдаа итгэлтэй байна уу?')) return;
-  await fetch(`/admin/question/${id}/delete`, {method:'POST'});
-  document.getElementById(`qi_${id}`).remove();
-  qCount--;
-  if (!document.querySelector('.q-card')) {
-    const div = document.createElement('div');
-    div.id = 'emptyState';
-    div.style.cssText = 'text-align:center;padding:48px;background:#fff;border-radius:8px;box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);color:#80868b;font-size:.9rem;';
-    div.textContent = 'Асуулт байхгүй байна. Доорх товчоор нэмнэ үү.';
-    document.getElementById('qList').appendChild(div);
+async function deleteQ(id,e) {
+  if(e)e.stopPropagation();
+  if(!confirm('Устгахдаа итгэлтэй байна уу?'))return;
+  await fetch(`/admin/question/${id}/delete`,{method:'POST'});
+  document.getElementById(`qi_${id}`)?.remove();
+  if(!document.querySelector('.q-card')){
+    const d=document.createElement('div');d.id='emptyState';
+    d.style.cssText='text-align:center;padding:48px;background:#fff;border-radius:8px;box-shadow:0 2px 1px -1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.06);color:#80868b;font-size:.9rem;';
+    d.textContent='Асуулт байхгүй байна.';document.getElementById('qList').appendChild(d);
   }
 }
 
-// ── Add new question ──────────────────────────────────────────
-function togglePanel() {
-  document.getElementById('addPanel').classList.toggle('open');
+// ── Sub-question panel ────────────────────────────────────────
+function openSubPanel(parentId, triggerVal) {
+  // Close other panels
+  document.querySelectorAll('.sub-add-panel.open').forEach(p=>p.classList.remove('open'));
+  document.getElementById(`subpanel_trigger_${parentId}`).value = triggerVal;
+  document.getElementById(`subpanel_title_${parentId}`).textContent = `↳ "${triggerVal}" гэж хариулсан үед гарах дэд асуулт`;
+  document.getElementById(`subpanel_${parentId}`).classList.add('open');
+  document.getElementById(`subtext_${parentId}`).focus();
 }
-function selectType(t) {
-  selectedType = t;
-  document.querySelectorAll('.add-panel .type-opt').forEach(el => {
-    el.classList.toggle('selected', el.dataset.val === t);
-  });
-  document.getElementById('optSection').style.display =
-    (t === 'rating' || t === 'text') ? 'none' : 'block';
+function closeSubPanel(id) {
+  document.getElementById(`subpanel_${id}`).classList.remove('open');
+  document.getElementById(`subtext_${id}`).value='';
 }
-function addOpt() {
-  const list = document.getElementById('optList');
-  const n = list.children.length + 1;
-  const row = document.createElement('div');
-  row.className = 'opt-row';
-  row.innerHTML = `<span style="color:#80868b;font-size:.9rem;">○</span>
-    <input type="text" class="gf-input-box opt-input" placeholder="Сонголт ${n}" style="padding:8px 10px;">
-    <button class="opt-del" onclick="delOpt(this)">×</button>`;
+function selectSubType(id, t) {
+  subTypes[id]=t;
+  document.querySelectorAll(`#subtypegrid_${id} .type-opt`).forEach(el=>el.classList.toggle('selected',el.dataset.val===t));
+  document.getElementById(`suboptSection_${id}`).style.display=(t==='rating'||t==='text')?'none':'block';
+}
+function addSubOpt(id) {
+  const list=document.getElementById(`suboptList_${id}`);
+  const n=list.children.length+1;
+  const row=document.createElement('div');row.className='opt-row';
+  row.innerHTML=`<span style="color:#80868b;font-size:.85rem;">○</span><input type="text" class="gf-input-box" placeholder="Сонголт ${n}" style="padding:7px 10px;"><button class="opt-del" onclick="this.closest('.opt-row').remove()">×</button>`;
   list.appendChild(row);
 }
-function delOpt(btn) {
-  if (document.getElementById('optList').children.length > 1)
-    btn.closest('.opt-row').remove();
-}
-
-function chipClass(t) {
-  return {single:'gf-chip-purple',multiple:'gf-chip-blue',rating:'gf-chip-green',text:'gf-chip-red'}[t];
-}
-function chipLabel(t) {
-  return {single:'⦿ Нэг сонголт',multiple:'☑ Олон сонголт',rating:'★ Үнэлгээ',text:'✏ Текст'}[t];
-}
-
-async function addNewQ() {
-  const text = document.getElementById('qText').value.trim();
-  if (!text) { document.getElementById('qText').focus(); return; }
-
-  let options = [];
-  if (selectedType === 'single' || selectedType === 'multiple') {
-    options = Array.from(document.querySelectorAll('#optList .opt-input'))
-      .map(i => i.value.trim()).filter(v => v);
-    if (options.length < 2) { alert('Хамгийн багадаа 2 сонголт оруулна уу'); return; }
+async function saveSubQ(parentId) {
+  const text=document.getElementById(`subtext_${parentId}`).value.trim();
+  if(!text){document.getElementById(`subtext_${parentId}`).focus();return;}
+  const type=subTypes[parentId]||'single';
+  const triggerVal=document.getElementById(`subpanel_trigger_${parentId}`).value;
+  let options=[];
+  if(type==='single'||type==='multiple'){
+    options=Array.from(document.querySelectorAll(`#suboptList_${parentId} input[type=text]`)).map(i=>i.value.trim()).filter(v=>v);
+    if(options.length<2){alert('Хамгийн багадаа 2 сонголт оруулна уу');return;}
   }
-
-  const res = await fetch(`/admin/survey/${surveyId}/add-question`, {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({text, type: selectedType, options})
+  const res=await fetch(`/admin/survey/${surveyId}/add-question`,{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({text,type,options,parent_question_id:parentId,trigger_value:triggerVal})
   });
-  const data = await res.json();
-
-  document.getElementById('emptyState')?.remove();
-  qCount++;
-
-  const div = document.createElement('div');
-  div.className = 'q-card'; div.id = `qi_${data.id}`;
-  div.setAttribute('onclick', `startEdit(${data.id}, event)`);
-  div.innerHTML = `
-    <div class="q-view">
-      <span class="q-num">${qCount}</span>
-      <span class="q-text-label">${data.text}</span>
-      <span class="gf-chip ${chipClass(data.type)}" style="font-size:.75rem;">${chipLabel(data.type)}</span>
+  const data=await res.json();
+  // Insert sub-card after parent's last sub-card (before the add-sub-row)
+  const subrow=document.getElementById(`subrow_${parentId}`);
+  const chipC={single:'gf-chip-purple',multiple:'gf-chip-blue',rating:'gf-chip-green',text:'gf-chip-red'};
+  const chipL={single:'⦿ Нэг',multiple:'☑ Олон',rating:'★ Үнэлгээ',text:'✏ Текст'};
+  const div=document.createElement('div');
+  div.className='sub-card';div.id=`qi_${data.id}`;
+  div.setAttribute('onclick',`startEdit('sub',${data.id},event)`);
+  div.innerHTML=`
+    <div class="q-view" style="flex:1;">
+      <span style="color:#9c4dcc;font-size:.85rem;">↳</span>
+      <span class="sub-trigger-tag">"${data.trigger_value}" үед</span>
+      <span class="q-text-label" id="qlabel_${data.id}" style="font-size:.88rem;">${data.text}</span>
+      <span class="gf-chip ${chipC[data.type]}" id="qchip_${data.id}" style="font-size:.7rem;">${chipL[data.type]}</span>
       <div class="q-actions">
-        <button class="icon-btn" onclick="startEdit(${data.id},event);event.stopPropagation();" title="Засах" style="font-size:.9rem;">✏️</button>
-        <button class="icon-btn" onclick="deleteQ(${data.id},event)" title="Устгах" style="color:#80868b;font-size:.9rem;">🗑</button>
+        <button class="icon-btn" onclick="startEdit('sub',${data.id},event);event.stopPropagation();" style="font-size:.85rem;">✏️</button>
+        <button class="icon-btn" onclick="deleteQ(${data.id},event)" style="color:#80868b;font-size:.85rem;">🗑</button>
       </div>
     </div>
-    <div class="q-edit" id="qedit_${data.id}" data-id="${data.id}" data-type="${data.type}">
-      <div style="margin-bottom:16px;">
+    <div class="q-edit" id="qedit_${data.id}" data-type="${data.type}">
+      <div style="margin-bottom:14px;">
         <label style="font-size:.8rem;color:#5f6368;display:block;margin-bottom:4px;">Асуулт</label>
-        <input type="text" class="gf-input-box eq-text" id="eqtext_${data.id}" value="${data.text}" placeholder="Асуулт">
+        <input type="text" class="gf-input-box eq-text" id="eqtext_${data.id}" value="${data.text}">
       </div>
-      <div style="margin-bottom:16px;">
-        <label style="font-size:.8rem;color:#5f6368;display:block;margin-bottom:8px;">Төрөл</label>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:.8rem;color:#5f6368;display:block;margin-bottom:6px;">Төрөл</label>
         <div class="type-grid" id="etypegrid_${data.id}">
           <div class="type-opt ${data.type==='single'?'selected':''}" data-val="single" onclick="selectEditType(${data.id},'single')">⦿ Нэг сонголт</div>
           <div class="type-opt ${data.type==='multiple'?'selected':''}" data-val="multiple" onclick="selectEditType(${data.id},'multiple')">☑ Олон сонголт</div>
-          <div class="type-opt ${data.type==='rating'?'selected':''}" data-val="rating" onclick="selectEditType(${data.id},'rating')">★ Үнэлгээ (1–5)</div>
-          <div class="type-opt ${data.type==='text'?'selected':''}" data-val="text" onclick="selectEditType(${data.id},'text')">✏ Нээлттэй текст</div>
+          <div class="type-opt ${data.type==='rating'?'selected':''}" data-val="rating" onclick="selectEditType(${data.id},'rating')">★ Үнэлгээ</div>
+          <div class="type-opt ${data.type==='text'?'selected':''}" data-val="text" onclick="selectEditType(${data.id},'text')">✏ Текст</div>
         </div>
       </div>
-      <div id="eoptSection_${data.id}" style="margin-bottom:20px;${(data.type==='rating'||data.type==='text')?'display:none':''}">
-        <label style="font-size:.8rem;color:#5f6368;display:block;margin-bottom:8px;">Сонголтууд</label>
+      <div id="eoptSection_${data.id}" style="margin-bottom:14px;${(data.type==='rating'||data.type==='text')?'display:none':''}">
+        <label style="font-size:.8rem;color:#5f6368;display:block;margin-bottom:6px;">Сонголтууд</label>
         <div id="eoptList_${data.id}">
           ${options.map(o=>`<div class="opt-row"><span style="color:#80868b;font-size:.9rem;">○</span><input type="text" class="gf-input-box eq-opt" value="${o}" style="padding:8px 10px;"><button class="opt-del" onclick="this.closest('.opt-row').remove()">×</button></div>`).join('')}
         </div>
-        <button class="gf-btn gf-btn-text" style="padding:6px 10px;font-size:.82rem;margin-top:4px;" onclick="addEditOpt(${data.id})">+ Сонголт нэмэх</button>
+        <button class="gf-btn gf-btn-text" style="padding:6px 10px;font-size:.8rem;margin-top:4px;" onclick="addEditOpt(${data.id})">+ Нэмэх</button>
       </div>
       <div style="display:flex;gap:10px;align-items:center;">
-        <button class="gf-btn gf-btn-primary" onclick="saveQ(${data.id})">Хадгалах</button>
-        <button class="gf-btn gf-btn-text" onclick="cancelEdit(${data.id})">Цуцлах</button>
+        <button class="gf-btn gf-btn-primary" style="font-size:.85rem;padding:9px 18px;" onclick="saveQ(${data.id})">Хадгалах</button>
+        <button class="gf-btn gf-btn-text" style="font-size:.85rem;" onclick="cancelEdit(${data.id})">Цуцлах</button>
         <div style="flex:1;"></div>
-        <button class="icon-btn" onclick="deleteQ(${data.id},event)" title="Устгах" style="color:#d93025;">🗑</button>
+        <button class="icon-btn" onclick="deleteQ(${data.id},event)" style="color:#d93025;">🗑</button>
+      </div>
+    </div>`;
+  subrow.parentNode.insertBefore(div, subrow);
+  closeSubPanel(parentId);
+  editTypes[data.id]=data.type;
+}
+
+// ── Add main question ─────────────────────────────────────────
+function togglePanel(){ document.getElementById('addPanel').classList.toggle('open'); }
+function selectMainType(t){
+  mainType=t;
+  document.querySelectorAll('#maintypegrid .type-opt').forEach(el=>el.classList.toggle('selected',el.dataset.val===t));
+  document.getElementById('mainoptSection').style.display=(t==='rating'||t==='text')?'none':'block';
+}
+function addOpt(){
+  const list=document.getElementById('mainoptList');const n=list.children.length+1;
+  const row=document.createElement('div');row.className='opt-row';
+  row.innerHTML=`<span style="color:#80868b;font-size:.9rem;">○</span><input type="text" class="gf-input-box opt-input" placeholder="Сонголт ${n}" style="padding:8px 10px;"><button class="opt-del" onclick="delOpt(this)">×</button>`;
+  list.appendChild(row);
+}
+function delOpt(btn){ if(document.getElementById('mainoptList').children.length>1)btn.closest('.opt-row').remove(); }
+
+async function addNewQ(){
+  const text=document.getElementById('qText').value.trim();
+  if(!text){document.getElementById('qText').focus();return;}
+  let options=[];
+  if(mainType==='single'||mainType==='multiple'){
+    options=Array.from(document.querySelectorAll('#mainoptList .opt-input')).map(i=>i.value.trim()).filter(v=>v);
+    if(options.length<2){alert('Хамгийн багадаа 2 сонголт оруулна уу');return;}
+  }
+  const res=await fetch(`/admin/survey/${surveyId}/add-question`,{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({text,type:mainType,options})
+  });
+  const data=await res.json();
+  document.getElementById('emptyState')?.remove();
+
+  const chipC={single:'gf-chip-purple',multiple:'gf-chip-blue',rating:'gf-chip-green',text:'gf-chip-red'};
+  const chipL={single:'⦿ Нэг',multiple:'☑ Олон',rating:'★ Үнэлгээ',text:'✏ Текст'};
+  const qCount=document.querySelectorAll('.q-card').length+1;
+
+  const div=document.createElement('div');div.className='q-card';div.id=`qi_${data.id}`;
+  div.setAttribute('onclick',`startEdit('q',${data.id},event)`);
+  div.innerHTML=`
+    <div class="q-view">
+      <span class="q-num">${qCount}</span>
+      <span class="q-text-label" id="qlabel_${data.id}">${data.text}</span>
+      <span class="gf-chip ${chipC[data.type]}" id="qchip_${data.id}" style="font-size:.72rem;">${chipL[data.type]}</span>
+      <div class="q-actions">
+        <button class="icon-btn" onclick="startEdit('q',${data.id},event);event.stopPropagation();" style="font-size:.85rem;">✏️</button>
+        <button class="icon-btn" onclick="deleteQ(${data.id},event)" style="color:#80868b;font-size:.85rem;">🗑</button>
+      </div>
+    </div>
+    <div class="q-edit" id="qedit_${data.id}" data-type="${data.type}">
+      <div style="margin-bottom:14px;">
+        <label style="font-size:.8rem;color:#5f6368;display:block;margin-bottom:4px;">Асуулт</label>
+        <input type="text" class="gf-input-box eq-text" id="eqtext_${data.id}" value="${data.text}">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:.8rem;color:#5f6368;display:block;margin-bottom:6px;">Төрөл</label>
+        <div class="type-grid" id="etypegrid_${data.id}">
+          <div class="type-opt ${data.type==='single'?'selected':''}" data-val="single" onclick="selectEditType(${data.id},'single')">⦿ Нэг сонголт</div>
+          <div class="type-opt ${data.type==='multiple'?'selected':''}" data-val="multiple" onclick="selectEditType(${data.id},'multiple')">☑ Олон сонголт</div>
+          <div class="type-opt ${data.type==='rating'?'selected':''}" data-val="rating" onclick="selectEditType(${data.id},'rating')">★ Үнэлгээ</div>
+          <div class="type-opt ${data.type==='text'?'selected':''}" data-val="text" onclick="selectEditType(${data.id},'text')">✏ Текст</div>
+        </div>
+      </div>
+      <div id="eoptSection_${data.id}" style="margin-bottom:14px;${(data.type==='rating'||data.type==='text')?'display:none':''}">
+        <label style="font-size:.8rem;color:#5f6368;display:block;margin-bottom:6px;">Сонголтууд</label>
+        <div id="eoptList_${data.id}">
+          ${options.map(o=>`<div class="opt-row"><span style="color:#80868b;font-size:.9rem;">○</span><input type="text" class="gf-input-box eq-opt" value="${o}" style="padding:8px 10px;"><button class="opt-del" onclick="this.closest('.opt-row').remove()">×</button></div>`).join('')}
+        </div>
+        <button class="gf-btn gf-btn-text" style="padding:6px 10px;font-size:.8rem;margin-top:4px;" onclick="addEditOpt(${data.id})">+ Нэмэх</button>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button class="gf-btn gf-btn-primary" style="font-size:.85rem;padding:9px 18px;" onclick="saveQ(${data.id})">Хадгалах</button>
+        <button class="gf-btn gf-btn-text" style="font-size:.85rem;" onclick="cancelEdit(${data.id})">Цуцлах</button>
+        <div style="flex:1;"></div>
+        <button class="icon-btn" onclick="deleteQ(${data.id},event)" style="color:#d93025;">🗑</button>
       </div>
     </div>`;
   document.getElementById('qList').appendChild(div);
-  editTypes[data.id] = data.type;
+  editTypes[data.id]=data.type;
 
-  document.getElementById('qText').value = '';
+  // Add sub-question buttons if single/multiple
+  if(data.type==='single'||data.type==='multiple'){
+    const subrow=document.createElement('div');subrow.className='add-sub-row';subrow.id=`subrow_${data.id}`;
+    subrow.innerHTML=`<span style="font-size:.75rem;color:#80868b;align-self:center;">Дэд асуулт нэмэх:</span>${options.map(o=>`<button class="add-sub-btn" onclick="openSubPanel(${data.id},'${o}')">+ "${o}"</button>`).join('')}`;
+    document.getElementById('qList').appendChild(subrow);
+
+    const panel=document.createElement('div');panel.className='sub-add-panel';panel.id=`subpanel_${data.id}`;
+    panel.innerHTML=`<div style="font-size:.82rem;font-weight:500;color:#512da8;margin-bottom:14px;" id="subpanel_title_${data.id}"></div>
+      <input type="hidden" id="subpanel_trigger_${data.id}">
+      <div style="margin-bottom:14px;"><label style="font-size:.82rem;color:#5f6368;display:block;margin-bottom:4px;">Дэд асуулт</label><input type="text" class="gf-input-box" id="subtext_${data.id}" placeholder="Дэд асуулт..."></div>
+      <div style="margin-bottom:14px;"><label style="font-size:.82rem;color:#5f6368;display:block;margin-bottom:6px;">Төрөл</label>
+      <div class="type-grid" id="subtypegrid_${data.id}">
+        <div class="type-opt selected" data-val="single" onclick="selectSubType(${data.id},'single')">⦿ Нэг сонголт</div>
+        <div class="type-opt" data-val="multiple" onclick="selectSubType(${data.id},'multiple')">☑ Олон сонголт</div>
+        <div class="type-opt" data-val="rating" onclick="selectSubType(${data.id},'rating')">★ Үнэлгээ</div>
+        <div class="type-opt" data-val="text" onclick="selectSubType(${data.id},'text')">✏ Текст</div>
+      </div></div>
+      <div id="suboptSection_${data.id}" style="margin-bottom:14px;"><label style="font-size:.82rem;color:#5f6368;display:block;margin-bottom:6px;">Сонголтууд</label>
+      <div id="suboptList_${data.id}">
+        <div class="opt-row"><span style="color:#80868b;font-size:.85rem;">○</span><input type="text" class="gf-input-box" placeholder="Сонголт 1" style="padding:7px 10px;"><button class="opt-del" onclick="this.closest('.opt-row').remove()">×</button></div>
+        <div class="opt-row"><span style="color:#80868b;font-size:.85rem;">○</span><input type="text" class="gf-input-box" placeholder="Сонголт 2" style="padding:7px 10px;"><button class="opt-del" onclick="this.closest('.opt-row').remove()">×</button></div>
+      </div>
+      <button class="gf-btn gf-btn-text" style="padding:5px 10px;font-size:.78rem;margin-top:4px;" onclick="addSubOpt(${data.id})">+ Нэмэх</button></div>
+      <div style="display:flex;gap:10px;">
+        <button class="gf-btn gf-btn-primary" style="font-size:.85rem;padding:9px 18px;" onclick="saveSubQ(${data.id})">Нэмэх</button>
+        <button class="gf-btn gf-btn-text" style="font-size:.85rem;" onclick="closeSubPanel(${data.id})">Цуцлах</button>
+      </div>`;
+    document.getElementById('qList').appendChild(panel);
+  }
+
+  document.getElementById('qText').value='';
   document.getElementById('addPanel').classList.remove('open');
 }
 </script>

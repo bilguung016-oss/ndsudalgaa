@@ -2,8 +2,20 @@
 {% block title %}{{ survey.title }}{% endblock %}
 {% block head %}
 <style>
-  .gf-question { position: relative; }
-  .gf-question.answered { border-left-color: #673ab7; }
+  .sub-question {
+    display: none;
+    margin-top: 10px;
+    margin-left: 28px;
+    background: #faf7ff;
+    border-radius: 8px;
+    border-left: 3px solid #673ab7;
+    padding: 16px 20px;
+  }
+  .sub-question.visible { display: block; }
+  .sub-label {
+    font-size: .75rem; font-weight: 500; color: #673ab7;
+    margin-bottom: 8px; display: flex; align-items: center; gap: 4px;
+  }
 </style>
 {% endblock %}
 {% block content %}
@@ -29,7 +41,8 @@
       <div style="display:flex; flex-direction:column; gap:2px;">
         {% for opt in q.get_options() %}
         <label class="gf-option">
-          <input type="radio" name="q_{{ q.id }}" value="{{ opt }}" required onchange="markAnswered('qcard_{{ q.id }}')">
+          <input type="radio" name="q_{{ q.id }}" value="{{ opt }}" required
+            onchange="handleChange({{ q.id }}, '{{ opt }}')">
           <span>{{ opt }}</span>
         </label>
         {% endfor %}
@@ -39,7 +52,8 @@
       <div style="display:flex; flex-direction:column; gap:2px;">
         {% for opt in q.get_options() %}
         <label class="gf-option">
-          <input type="checkbox" name="q_{{ q.id }}" value="{{ opt }}" onchange="markAnswered('qcard_{{ q.id }}')">
+          <input type="checkbox" name="q_{{ q.id }}" value="{{ opt }}"
+            onchange="handleChange({{ q.id }}, '{{ opt }}')">
           <span>{{ opt }}</span>
         </label>
         {% endfor %}
@@ -48,30 +62,109 @@
     {% elif q.question_type == 'rating' %}
       <div class="star-group">
         {% for i in [5,4,3,2,1] %}
-        <input type="radio" id="s{{ q.id }}_{{ i }}" name="q_{{ q.id }}" value="{{ i }}" required onchange="markAnswered('qcard_{{ q.id }}')">
+        <input type="radio" id="s{{ q.id }}_{{ i }}" name="q_{{ q.id }}" value="{{ i }}" required
+          onchange="handleChange({{ q.id }}, '{{ i }}')">
         <label for="s{{ q.id }}_{{ i }}">★</label>
         {% endfor %}
       </div>
       <p class="gf-hint" style="margin-top:10px;">1 = маш муу &nbsp;·&nbsp; 5 = маш сайн</p>
 
     {% elif q.question_type == 'text' %}
-      <input type="text" class="gf-input" name="q_{{ q.id }}" placeholder="Хариулт" oninput="markAnswered('qcard_{{ q.id }}')">
+      <input type="text" class="gf-input" name="q_{{ q.id }}" placeholder="Хариулт"
+        oninput="handleChange({{ q.id }}, this.value)">
     {% endif %}
+
+    <!-- Sub-questions -->
+    {% if q.sub_questions %}
+      {% for sub in q.sub_questions %}
+      <div class="sub-question" id="sub_{{ sub.id }}" data-trigger="{{ sub.trigger_value }}">
+        <div class="sub-label">
+          ↳ "{{ sub.trigger_value }}" гэж хариулсан тохиолдолд
+        </div>
+        <label class="gf-label" style="font-size:.95rem;">
+          {{ sub.text }}
+        </label>
+
+        {% if sub.question_type == 'single' %}
+          <div style="display:flex; flex-direction:column; gap:2px; margin-top:8px;">
+            {% for opt in sub.get_options() %}
+            <label class="gf-option">
+              <input type="radio" name="q_{{ sub.id }}" value="{{ opt }}">
+              <span>{{ opt }}</span>
+            </label>
+            {% endfor %}
+          </div>
+
+        {% elif sub.question_type == 'multiple' %}
+          <div style="display:flex; flex-direction:column; gap:2px; margin-top:8px;">
+            {% for opt in sub.get_options() %}
+            <label class="gf-option">
+              <input type="checkbox" name="q_{{ sub.id }}" value="{{ opt }}">
+              <span>{{ opt }}</span>
+            </label>
+            {% endfor %}
+          </div>
+
+        {% elif sub.question_type == 'rating' %}
+          <div class="star-group" style="margin-top:8px;">
+            {% for i in [5,4,3,2,1] %}
+            <input type="radio" id="s{{ sub.id }}_{{ i }}" name="q_{{ sub.id }}" value="{{ i }}">
+            <label for="s{{ sub.id }}_{{ i }}">★</label>
+            {% endfor %}
+          </div>
+
+        {% elif sub.question_type == 'text' %}
+          <input type="text" class="gf-input" name="q_{{ sub.id }}"
+            placeholder="Хариулт" style="margin-top:8px;">
+        {% endif %}
+      </div>
+      {% endfor %}
+    {% endif %}
+
   </div>
   {% endfor %}
 
   <div class="gf-submit-row">
     <button type="submit" class="gf-btn gf-btn-primary">Илгээх</button>
-    <button type="reset" class="gf-btn gf-btn-text" onclick="clearAll()">Цэвэрлэх</button>
+    <button type="reset" class="gf-btn gf-btn-text" onclick="resetAll()">Цэвэрлэх</button>
   </div>
 </form>
 
 <script>
-function markAnswered(id) {
-  document.getElementById(id)?.classList.add('answered');
+// Show/hide sub-questions based on parent answer
+function handleChange(parentId, selectedValue) {
+  // Find all sub-questions of this parent
+  const subs = document.querySelectorAll(`[id^="sub_"]`);
+  subs.forEach(sub => {
+    // Check if this sub belongs to parent question
+    const trigger = sub.dataset.trigger;
+    const input = sub.querySelector('input');
+    if (!input) return;
+    const name = input.name; // q_XX
+    // Find its parent by checking hidden data
+    if (sub.closest('.gf-question')?.id === `qcard_${parentId}`) {
+      if (selectedValue === trigger) {
+        sub.classList.add('visible');
+      } else {
+        sub.classList.remove('visible');
+        // Clear sub-question inputs
+        sub.querySelectorAll('input').forEach(i => {
+          if (i.type === 'radio' || i.type === 'checkbox') i.checked = false;
+          else i.value = '';
+        });
+      }
+    }
+  });
 }
-function clearAll() {
-  document.querySelectorAll('.gf-question').forEach(c => c.classList.remove('answered'));
+
+function resetAll() {
+  document.querySelectorAll('.sub-question').forEach(s => {
+    s.classList.remove('visible');
+    s.querySelectorAll('input').forEach(i => {
+      if (i.type === 'radio' || i.type === 'checkbox') i.checked = false;
+      else i.value = '';
+    });
+  });
 }
 </script>
 {% endblock %}

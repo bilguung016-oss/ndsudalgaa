@@ -33,6 +33,10 @@ class Question(db.Model):
     question_type = db.Column(db.String(20), default='single')  # single, multiple, text, rating
     options = db.Column(db.Text)  # JSON array of option strings
     order = db.Column(db.Integer, default=0)
+    parent_question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=True)
+    trigger_value = db.Column(db.String(500), nullable=True)  # answer value that triggers this sub-question
+    sub_questions = db.relationship('Question', backref=db.backref('parent', remote_side='Question.id'),
+                                    lazy=True, cascade='all, delete-orphan')
     answers = db.relationship('Answer', backref='question', lazy=True, cascade='all, delete-orphan')
 
     def get_options(self):
@@ -69,21 +73,24 @@ def take_survey(survey_id):
     if not survey.is_active:
         return render_template('closed.html', survey=survey)
 
-    questions = Question.query.filter_by(survey_id=survey_id).order_by(Question.order).all()
+    # Only top-level questions, sub-questions are nested inside
+    questions = Question.query.filter_by(survey_id=survey_id, parent_question_id=None).order_by(Question.order).all()
+    all_questions = Question.query.filter_by(survey_id=survey_id).all()
 
     if request.method == 'POST':
         response = Response(survey_id=survey_id)
         db.session.add(response)
         db.session.flush()
 
-        for question in questions:
+        for question in all_questions:
             if question.question_type == 'multiple':
                 values = request.form.getlist(f'q_{question.id}')
                 value = json.dumps(values)
             else:
                 value = request.form.get(f'q_{question.id}', '')
-            answer = Answer(response_id=response.id, question_id=question.id, value=value)
-            db.session.add(answer)
+            if value:
+                answer = Answer(response_id=response.id, question_id=question.id, value=value)
+                db.session.add(answer)
 
         db.session.commit()
         return redirect(url_for('thank_you', survey_id=survey_id))
@@ -158,7 +165,7 @@ def new_survey():
 @admin_required
 def edit_survey(survey_id):
     survey = Survey.query.get_or_404(survey_id)
-    questions = Question.query.filter_by(survey_id=survey_id).order_by(Question.order).all()
+    questions = Question.query.filter_by(survey_id=survey_id, parent_question_id=None).order_by(Question.order).all()
     return render_template('edit_survey.html', survey=survey, questions=questions)
 
 
@@ -173,11 +180,17 @@ def add_question(survey_id):
         text=data['text'],
         question_type=data.get('type', 'single'),
         options=options,
-        order=count
+        order=count,
+        parent_question_id=data.get('parent_question_id'),
+        trigger_value=data.get('trigger_value')
     )
     db.session.add(q)
     db.session.commit()
-    return jsonify({'id': q.id, 'text': q.text, 'type': q.question_type})
+    return jsonify({
+        'id': q.id, 'text': q.text, 'type': q.question_type,
+        'parent_question_id': q.parent_question_id,
+        'trigger_value': q.trigger_value
+    })
 
 
 @app.route('/admin/question/<int:question_id>/update', methods=['POST'])
