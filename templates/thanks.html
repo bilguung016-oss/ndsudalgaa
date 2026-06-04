@@ -2,11 +2,28 @@
 {% block title %}Баярлалаа{% endblock %}
 {% block topbar_actions %}<a href="/" class="topbar-link">← Нүүр</a>{% endblock %}
 {% block content %}
-<div style="min-height:60vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:80px 0;">
-  <div style="font-size:2rem; color:var(--gold); margin-bottom:24px; font-family:'Playfair Display',serif;">✓</div>
-  <div class="section-eyebrow">Амжилттай</div>
-  <h1 class="section-title">Баярлалаа</h1>
-  <p style="font-size:.88rem; color:var(--muted); margin-bottom:40px;">{{ survey.title }} — таны хариулт бүртгэгдлээ.</p>
-  <a href="/" class="btn btn-outline">← Нүүр хуудас</a>
+<div style="min-height:70vh;display:flex;align-items:center;justify-content:center;">
+  <div class="card-3d" style="max-width:480px;width:100%;text-align:center;padding:56px 40px;">
+    <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--red));
+      display:flex;align-items:center;justify-content:center;margin:0 auto 24px;
+      box-shadow:0 8px 32px rgba(1,81,151,.3);" class="float-anim">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+    </div>
+    <div style="font-size:.68rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);margin-bottom:12px;">
+      Амжилттай
+    </div>
+    <h1 style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:600;color:var(--text);margin-bottom:10px;">
+      Баярлалаа!
+    </h1>
+    <p style="font-size:.88rem;color:var(--muted);line-height:1.7;margin-bottom:32px;">
+      Таны хариулт амжилттай бүртгэгдлээ.<br>
+      <strong style="color:var(--text);">{{ survey.title }}</strong>
+    </p>
+    <!-- Mongolia map small decoration -->
+    <svg viewBox="0 0 300 130" style="width:140px;height:auto;opacity:.08;margin:0 auto 28px;display:block;" fill="var(--blue)">
+      <path d="M 30,50 L 52,38 L 76,28 L 104,22 L 132,16 L 160,12 L 188,9 L 216,12 L 238,22 L 244,30 L 240,40 L 236,50 L 238,60 L 234,68 L 214,78 L 186,82 L 158,86 L 130,86 L 102,82 L 74,72 L 44,58 Z"/>
+    </svg>
+    <a href="/" class="btn btn-primary" style="justify-content:center;">← Нүүр хуудас руу буцах</a>
+  </div>
 </div>
 {% endblock %}

@@ -5,25 +5,51 @@
 {% endblock %}
 {% block content %}
 
-<div class="card card-header" style="border-left:3px solid var(--gold); margin-bottom:2px;">
-  <div style="font-size:.65rem; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); margin-bottom:14px;">
-    Судалгаа
+<div class="card-3d" style="border-top:none;position:relative;overflow:hidden;margin-bottom:12px;">
+  <!-- Top gradient bar -->
+  <div style="position:absolute;top:0;left:0;right:0;height:4px;
+    background:linear-gradient(90deg,var(--blue) 0%,var(--red) 100%);"></div>
+  <!-- Mongolia map watermark -->
+  <svg viewBox="0 0 300 130" style="position:absolute;right:-10px;bottom:-10px;width:200px;height:auto;opacity:.04;pointer-events:none;" fill="var(--blue)">
+    <path d="M 30,50 L 40,42 L 52,38 L 64,34 L 76,28 L 90,26 L 104,22 L 118,18 L 132,16 L 146,14 L 160,12 L 174,10 L 188,9 L 202,10 L 216,12 L 228,16 L 238,22 L 244,30 L 240,40 L 236,50 L 238,60 L 234,68 L 226,74 L 214,78 L 200,80 L 186,82 L 172,84 L 158,86 L 144,87 L 130,86 L 116,84 L 102,82 L 88,78 L 74,72 L 60,66 L 44,58 Z"/>
+  </svg>
+
+  <div style="padding-top:10px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+        <rect width="36" height="36" rx="7" fill="var(--blue)"/>
+        <path d="M18 5 C18 5 16 8 18 10 C20 8 18 5 18 5Z" fill="#D4A843"/>
+        <circle cx="18" cy="13" r="2.5" fill="#D4A843"/>
+        <rect x="11" y="17" width="14" height="1.5" rx=".75" fill="white"/>
+        <rect x="12" y="20" width="12" height="1.5" rx=".75" fill="white"/>
+        <rect x="13" y="23" width="10" height="1.5" rx=".75" fill="white"/>
+        <rect x="11" y="27" width="14" height="1.5" rx=".75" fill="#C4272F"/>
+        <path d="M11 18.5 L11 26.5 L9 22.5 Z" fill="#D4A843"/>
+        <path d="M25 18.5 L25 26.5 L27 22.5 Z" fill="#D4A843"/>
+      </svg>
+      <span style="font-size:.68rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--blue);">
+        Судалгаа
+      </span>
+    </div>
+    <h1 style="font-family:'Playfair Display',serif;font-size:1.75rem;font-weight:600;
+      color:var(--text);line-height:1.3;margin-bottom:10px;">
+      {{ survey.title }}
+    </h1>
+    {% if survey.description %}
+    <p style="font-size:.88rem;color:var(--muted);line-height:1.7;">{{ survey.description }}</p>
+    {% endif %}
+    <div class="divider" style="margin:18px 0 10px;"></div>
+    <p style="font-size:.72rem;color:var(--red);font-weight:500;">
+      <span style="color:var(--red);">*</span> тэмдэгтэй асуулт заавал бөглөх
+    </p>
   </div>
-  <h1 style="font-family:'Playfair Display',serif; font-size:2rem; font-weight:400; line-height:1.3; margin-bottom:10px;">
-    {{ survey.title }}
-  </h1>
-  {% if survey.description %}
-  <p style="font-size:.88rem; color:var(--muted); line-height:1.7;">{{ survey.description }}</p>
-  {% endif %}
-  <div class="divider"></div>
-  <p style="font-size:.72rem; color:var(--gold); letter-spacing:.05em;">* Заавал бөглөх</p>
 </div>
 
 <form method="POST" id="surveyForm">
   {% for q in questions %}
-  <div class="question-block" id="qcard_{{ q.id }}">
-    <div class="question-num">Асуулт {{ loop.index }}</div>
-    <div class="question-label">
+  <div class="q-block" id="qcard_{{ q.id }}">
+    <div class="q-eyebrow">Асуулт {{ loop.index }}</div>
+    <div class="q-label">
       {{ q.text }}
       {% if q.question_type != 'text' %}<span class="required-star">*</span>{% endif %}
     </div>
@@ -49,14 +75,11 @@
     {% elif q.question_type == 'rating' %}
       <div class="star-group">
         {% for i in [5,4,3,2,1] %}
-        <input type="radio" id="s{{ q.id }}_{{ i }}" name="q_{{ q.id }}" value="{{ i }}" required
-          onchange="handleChange({{ q.id }}, '{{ i }}')">
+        <input type="radio" id="s{{ q.id }}_{{ i }}" name="q_{{ q.id }}" value="{{ i }}" required>
         <label for="s{{ q.id }}_{{ i }}">★</label>
         {% endfor %}
       </div>
-      <p style="font-size:.72rem; color:var(--muted); margin-top:10px; letter-spacing:.05em;">
-        1 — маш муу &nbsp;·&nbsp; 5 — маш сайн
-      </p>
+      <p style="font-size:.72rem;color:var(--muted);margin-top:8px;">1 — маш муу · 5 — маш сайн</p>
 
     {% elif q.question_type == 'text' %}
       <input type="text" class="gf-input" name="q_{{ q.id }}" placeholder="Хариултаа бичнэ үү…">
@@ -65,34 +88,20 @@
     {% if q.sub_questions %}
       {% for sub in q.sub_questions %}
       <div class="sub-block" id="sub_{{ sub.id }}" data-trigger="{{ sub.trigger_value }}">
-        <div class="sub-trigger-label">
-          <span>↳</span> "{{ sub.trigger_value }}" гэж хариулсан үед
-        </div>
-        <div class="question-label" style="margin-bottom:14px;">{{ sub.text }}</div>
-
+        <div class="sub-trigger-label">↳ "{{ sub.trigger_value }}" гэж хариулсан үед</div>
+        <div class="q-label" style="margin-bottom:14px;font-size:.9rem;">{{ sub.text }}</div>
         {% if sub.question_type == 'single' %}
           {% for opt in sub.get_options() %}
-          <label class="opt-item">
-            <input type="radio" name="q_{{ sub.id }}" value="{{ opt }}">
-            <span>{{ opt }}</span>
-          </label>
+          <label class="opt-item"><input type="radio" name="q_{{ sub.id }}" value="{{ opt }}"><span>{{ opt }}</span></label>
           {% endfor %}
         {% elif sub.question_type == 'multiple' %}
           {% for opt in sub.get_options() %}
-          <label class="opt-item">
-            <input type="checkbox" name="q_{{ sub.id }}" value="{{ opt }}">
-            <span>{{ opt }}</span>
-          </label>
+          <label class="opt-item"><input type="checkbox" name="q_{{ sub.id }}" value="{{ opt }}"><span>{{ opt }}</span></label>
           {% endfor %}
         {% elif sub.question_type == 'rating' %}
-          <div class="star-group">
-            {% for i in [5,4,3,2,1] %}
-            <input type="radio" id="s{{ sub.id }}_{{ i }}" name="q_{{ sub.id }}" value="{{ i }}">
-            <label for="s{{ sub.id }}_{{ i }}">★</label>
-            {% endfor %}
-          </div>
+          <div class="star-group">{% for i in [5,4,3,2,1] %}<input type="radio" id="s{{ sub.id }}_{{ i }}" name="q_{{ sub.id }}" value="{{ i }}"><label for="s{{ sub.id }}_{{ i }}">★</label>{% endfor %}</div>
         {% elif sub.question_type == 'text' %}
-          <input type="text" class="gf-input" name="q_{{ sub.id }}" placeholder="Хариултаа бичнэ үү…">
+          <input type="text" class="gf-input" name="q_{{ sub.id }}" placeholder="Хариулт…">
         {% endif %}
       </div>
       {% endfor %}
@@ -100,8 +109,11 @@
   </div>
   {% endfor %}
 
-  <div style="display:flex; align-items:center; gap:12px; padding-top:16px;">
-    <button type="submit" class="btn btn-gold">Илгээх</button>
+  <div style="display:flex;align-items:center;gap:12px;padding-top:8px;">
+    <button type="submit" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      Илгээх
+    </button>
     <button type="reset" class="btn btn-ghost" onclick="resetAll()">Цэвэрлэх</button>
   </div>
 </form>
@@ -109,24 +121,17 @@
 <script>
 function handleChange(parentId, val) {
   document.querySelectorAll(`#qcard_${parentId} .sub-block`).forEach(sub => {
-    if (sub.dataset.trigger === val) {
-      sub.classList.add('visible');
-    } else {
+    if (sub.dataset.trigger === val) sub.classList.add('visible');
+    else {
       sub.classList.remove('visible');
-      sub.querySelectorAll('input').forEach(i => {
-        if (i.type === 'radio' || i.type === 'checkbox') i.checked = false;
-        else i.value = '';
-      });
+      sub.querySelectorAll('input').forEach(i => { if(i.type==='radio'||i.type==='checkbox') i.checked=false; else i.value=''; });
     }
   });
 }
 function resetAll() {
   document.querySelectorAll('.sub-block').forEach(s => {
     s.classList.remove('visible');
-    s.querySelectorAll('input').forEach(i => {
-      if (i.type === 'radio' || i.type === 'checkbox') i.checked = false;
-      else i.value = '';
-    });
+    s.querySelectorAll('input').forEach(i => { if(i.type==='radio'||i.type==='checkbox') i.checked=false; else i.value=''; });
   });
 }
 </script>

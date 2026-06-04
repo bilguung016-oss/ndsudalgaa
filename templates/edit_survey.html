@@ -8,16 +8,17 @@
 {% block head %}
 <style>
   .q-card {
-    background:var(--bg2); border:1px solid var(--border);
-    border-left:3px solid transparent; padding:18px 22px;
-    margin-bottom:4px; transition:border-color .2s; cursor:pointer;
+    background:#fff; border:1px solid var(--border); border-radius:10px;
+    border-left:4px solid transparent; padding:18px 22px;
+    margin-bottom:6px; transition:all .2s; cursor:pointer;
+    box-shadow:0 2px 8px rgba(1,81,151,.04);
   }
-  .q-card:hover { border-left-color:var(--border2); }
-  .q-card.editing { border-left-color:var(--gold); cursor:default; }
+  .q-card:hover { border-left-color:var(--blue); box-shadow:0 4px 14px rgba(1,81,151,.1); }
+  .q-card.editing { border-left-color:var(--blue); cursor:default; }
   .sub-card {
-    background:var(--bg3); border:1px solid var(--border);
-    border-left:2px solid var(--gold); padding:14px 18px;
-    margin:4px 0 0 24px; cursor:pointer; transition:border-color .2s;
+    background:rgba(1,81,151,.03); border:1px solid rgba(1,81,151,.12);
+    border-left:3px solid var(--blue); border-radius:8px; padding:14px 18px;
+    margin:6px 0 0 24px; cursor:pointer; transition:all .2s;
   }
   .sub-card.editing { cursor:default; }
   .sub-trigger-tag {
@@ -48,12 +49,12 @@
   .sub-add-panel.open { display:block; }
   .type-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:6px; margin-bottom:14px; }
   .type-opt {
-    border:1px solid var(--border); padding:9px 12px;
+    border:1.5px solid var(--border); border-radius:8px; padding:9px 12px;
     cursor:pointer; font-size:.78rem; color:var(--muted);
     display:flex; align-items:center; gap:6px; transition:all .15s;
   }
-  .type-opt:hover { border-color:var(--gold); color:var(--gold); }
-  .type-opt.selected { border-color:var(--gold); color:var(--gold); background:rgba(201,169,110,.06); font-weight:500; }
+  .type-opt:hover { border-color:var(--blue); color:var(--blue); background:rgba(1,81,151,.04); }
+  .type-opt.selected { border-color:var(--blue); color:var(--blue); background:rgba(1,81,151,.06); font-weight:600; }
   .opt-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
   .opt-row input { flex:1; }
   .opt-del {
@@ -77,13 +78,13 @@
   }
   .header-desc:focus { border-bottom-color:var(--gold); }
   .save-badge { display:none; font-size:.7rem; color:var(--gold); margin-left:8px; }
-  .add-panel { background:var(--bg2); border:1px solid var(--border); margin-top:8px; }
+  .add-panel { background:#fff; border:1.5px dashed var(--border); border-radius:12px; margin-top:10px; }
   .add-panel-header {
     padding:16px 22px; cursor:pointer; display:flex; align-items:center; gap:10px;
     font-size:.72rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
-    color:var(--gold); transition:background .15s;
+    color:var(--blue); transition:background .15s; border-radius:12px;
   }
-  .add-panel-header:hover { background:rgba(201,169,110,.05); }
+  .add-panel-header:hover { background:rgba(1,81,151,.04); }
   .add-panel-body { display:none; padding:24px; border-top:1px solid var(--border); }
   .add-panel-body.open { display:block; }
   label.edit-label {
@@ -96,8 +97,9 @@
 <div class="page">
 
   <!-- Survey header — inline editable -->
-  <div style="background:var(--bg2); border:1px solid var(--border); border-left:3px solid var(--gold);
-    padding:28px 32px; margin-bottom:8px;">
+  <div style="background:#fff; border:1px solid var(--border); border-top:4px solid var(--blue);
+    border-radius:12px; padding:28px 32px; margin-bottom:8px;
+    box-shadow:0 4px 16px rgba(1,81,151,.08);">
     <div style="display:flex; align-items:flex-start; gap:8px;">
       <div style="flex:1;">
         <input class="header-title" id="surveyTitle" type="text"

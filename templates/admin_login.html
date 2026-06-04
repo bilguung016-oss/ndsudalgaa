@@ -2,20 +2,35 @@
 {% block title %}Нэвтрэх{% endblock %}
 {% block topbar_actions %}<a href="/" class="topbar-link">← Нүүр</a>{% endblock %}
 {% block content %}
-<div style="max-width:380px; margin:80px auto;">
-  <div class="section-eyebrow" style="text-align:center;">Систем</div>
-  <h2 style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:400; text-align:center; margin-bottom:40px;">Нэвтрэх</h2>
-
-  {% if error %}
-  <div class="alert alert-error">{{ error }}</div>
-  {% endif %}
-
-  <form method="POST" action="/admin/login">
-    <div style="margin-bottom:20px;">
-      <label style="font-size:.7rem; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:8px;">Нууц үг</label>
-      <input type="password" name="password" class="input-box" placeholder="••••••••" autofocus required>
+<div style="max-width:400px;margin:60px auto;">
+  <div class="card-3d">
+    <div style="text-align:center;margin-bottom:32px;">
+      <svg width="56" height="56" viewBox="0 0 36 36" fill="none" style="margin-bottom:14px;" class="float-anim">
+        <rect width="36" height="36" rx="10" fill="var(--blue)"/>
+        <path d="M18 4 C18 4 15.5 7.5 18 10 C20.5 7.5 18 4 18 4Z" fill="#D4A843"/>
+        <circle cx="18" cy="13" r="2.8" fill="#D4A843"/>
+        <rect x="11" y="17.5" width="14" height="1.8" rx=".9" fill="white"/>
+        <rect x="12.5" y="21" width="11" height="1.8" rx=".9" fill="white"/>
+        <rect x="14" y="24.5" width="8" height="1.8" rx=".9" fill="white"/>
+        <rect x="11" y="28" width="14" height="1.8" rx=".9" fill="#C4272F"/>
+        <path d="M11 19 L11 27.5 L8.5 23.5 Z" fill="#D4A843"/>
+        <path d="M25 19 L25 27.5 L27.5 23.5 Z" fill="#D4A843"/>
+      </svg>
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:600;color:var(--text);margin-bottom:6px;">
+        Системд нэвтрэх
+      </h2>
+      <p style="font-size:.82rem;color:var(--muted);">НД Судалгааны систем</p>
     </div>
-    <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center;">Нэвтрэх</button>
-  </form>
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    <form method="POST" action="/admin/login">
+      <div style="margin-bottom:20px;">
+        <label style="font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px;">Нууц үг</label>
+        <input type="password" name="password" class="input-box" placeholder="••••••••" autofocus required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;">
+        Нэвтрэх →
+      </button>
+    </form>
+  </div>
 </div>
 {% endblock %}

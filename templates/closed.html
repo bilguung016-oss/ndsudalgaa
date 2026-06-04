@@ -1,11 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Хаагдсан{% endblock %}
 {% block content %}
-<div style="min-height:60vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:80px 0;">
-  <div style="font-size:2rem; color:var(--muted); margin-bottom:24px;">—</div>
-  <div class="section-eyebrow">Дууссан</div>
-  <h1 class="section-title">Судалгаа хаагдсан</h1>
-  <p style="font-size:.88rem; color:var(--muted); margin-bottom:40px;">{{ survey.title }}</p>
-  <a href="/" class="btn btn-ghost">← Буцах</a>
+<div style="min-height:70vh;display:flex;align-items:center;justify-content:center;">
+  <div class="card-3d" style="max-width:420px;width:100%;text-align:center;padding:56px 40px;">
+    <div style="font-size:2.5rem;margin-bottom:16px;">🔒</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:600;color:var(--text);margin-bottom:10px;">
+      Судалгаа дууссан
+    </h2>
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:32px;">{{ survey.title }}</p>
+    <a href="/" class="btn btn-outline">← Нүүр хуудас</a>
+  </div>
 </div>
 {% endblock %}

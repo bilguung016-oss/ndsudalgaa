@@ -1,55 +1,147 @@
 {% extends "base.html" %}
-{% block title %}Судалгаанууд{% endblock %}
+{% block title %}НД Судалгааны систем{% endblock %}
 {% block topbar_actions %}
-<a href="/" class="topbar-link active">Нүүр</a>
-<a href="/admin" class="topbar-link">Админ</a>
+<a href="/" class="topbar-link">Нүүр</a>
+<a href="/admin" class="topbar-link primary">Админ</a>
 {% endblock %}
 {% block body %}
-<div class="page wide">
 
-  <div style="max-width:560px; padding: 64px 0 48px;">
-    <div class="section-eyebrow">Судалгааны систем</div>
-    <h1 class="section-title">Таны санал бодол<br>чухал</h1>
-    <p class="section-sub">Доорх судалгаануудад оролцож өөрийн үзэл бодлоо илэрхийлнэ үү.</p>
+<!-- Hero -->
+<div style="background:linear-gradient(135deg,#013d73 0%,#015197 45%,#01639e 70%,#8a1a21 100%);
+  min-height:420px; position:relative; overflow:hidden; display:flex; align-items:center;">
+
+  <!-- 3D Mongolia map SVG background -->
+  <svg viewBox="0 0 700 320" style="position:absolute;right:-40px;top:50%;transform:translateY(-50%);width:580px;height:auto;opacity:.18;pointer-events:none;" fill="none">
+    <defs>
+      <linearGradient id="mapGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="white" stop-opacity=".9"/>
+        <stop offset="100%" stop-color="#c4e0ff" stop-opacity=".4"/>
+      </linearGradient>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="3" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <!-- Mongolia outline (simplified) -->
+    <path filter="url(#glow)" fill="url(#mapGrad)"
+      d="M 70,120 L 85,105 L 100,95 L 118,90 L 130,82 L 148,78 L 160,70 L 178,68 L 192,62 L 208,58 L 222,52 L 240,48 L 258,44 L 272,40 L 288,38 L 306,36 L 320,34 L 336,32 L 350,30 L 366,28 L 382,26 L 396,24 L 412,22 L 428,20 L 444,22 L 458,26 L 470,32 L 480,38 L 490,42 L 502,40 L 514,36 L 526,34 L 538,38 L 548,44 L 556,52 L 560,62 L 558,74 L 552,84 L 548,94 L 550,106 L 548,118 L 542,128 L 534,136 L 524,142 L 512,148 L 498,152 L 484,154 L 470,158 L 456,162 L 440,164 L 424,166 L 408,168 L 392,170 L 376,172 L 360,174 L 344,176 L 328,178 L 312,176 L 296,174 L 280,172 L 264,170 L 248,168 L 232,166 L 216,164 L 200,162 L 184,160 L 168,158 L 152,154 L 136,150 L 120,144 L 106,136 L 92,128 Z"/>
+    <!-- 3D shadow/extrude effect -->
+    <path fill="rgba(0,0,0,.15)"
+      d="M 70,124 L 85,109 L 100,99 L 118,94 L 130,86 L 148,82 L 160,74 L 178,72 L 192,66 L 208,62 L 222,56 L 240,52 L 258,48 L 272,44 L 288,42 L 306,40 L 320,38 L 336,36 L 350,34 L 366,32 L 382,30 L 396,28 L 412,26 L 428,24 L 444,26 L 458,30 L 470,36 L 480,42 L 490,46 L 502,44 L 514,40 L 526,38 L 538,42 L 548,48 L 556,56 L 560,66 L 558,78 L 552,88 L 548,98 L 550,110 L 548,122 L 542,132 L 534,140 L 524,146 L 512,152 L 498,156 L 484,158 L 470,162 L 456,166 L 440,168 L 424,170 L 408,172 L 392,174 L 376,176 L 360,178 L 344,180 L 328,182 L 312,180 L 296,178 L 280,176 L 264,174 L 248,172 L 232,170 L 216,168 L 200,166 L 184,164 L 168,162 L 152,158 L 136,154 L 120,148 L 106,140 L 92,132 L 70,124 Z"/>
+    <!-- Cities dots -->
+    <circle cx="200" cy="120" r="4" fill="white" opacity=".9"/>
+    <circle cx="200" cy="120" r="8" fill="white" opacity=".2"/>
+    <circle cx="340" cy="95" r="3" fill="white" opacity=".7"/>
+    <circle cx="440" cy="110" r="3" fill="white" opacity=".7"/>
+    <circle cx="130" cy="140" r="2.5" fill="white" opacity=".6"/>
+  </svg>
+
+  <!-- Geometric 3D shapes -->
+  <div style="position:absolute;top:30px;left:60px;width:80px;height:80px;
+    border:2px solid rgba(255,255,255,.15);transform:rotate(45deg);border-radius:8px;"></div>
+  <div style="position:absolute;bottom:40px;left:120px;width:40px;height:40px;
+    border:1.5px solid rgba(196,39,47,.4);transform:rotate(20deg);border-radius:4px;"></div>
+  <div style="position:absolute;top:60px;right:200px;width:60px;height:60px;
+    border:1.5px solid rgba(255,255,255,.1);transform:rotate(30deg);border-radius:6px;"></div>
+
+  <!-- Content -->
+  <div style="position:relative;z-index:10; max-width:1060px; margin:0 auto; padding:60px 32px;">
+    <!-- Logo big -->
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
+      <svg width="56" height="56" viewBox="0 0 36 36" fill="none" class="float-anim">
+        <rect width="36" height="36" rx="8" fill="rgba(255,255,255,.15)" stroke="rgba(255,255,255,.3)" stroke-width="1"/>
+        <path d="M18 4 C18 4 15.5 7.5 18 10 C20.5 7.5 18 4 18 4Z" fill="#D4A843"/>
+        <circle cx="18" cy="13" r="2.8" fill="#D4A843"/>
+        <rect x="11" y="17.5" width="14" height="1.8" rx=".9" fill="white"/>
+        <rect x="12.5" y="21" width="11" height="1.8" rx=".9" fill="white"/>
+        <rect x="14" y="24.5" width="8" height="1.8" rx=".9" fill="white"/>
+        <rect x="11" y="28" width="14" height="1.8" rx=".9" fill="#C4272F"/>
+        <path d="M11 19 L11 27.5 L8.5 23.5 Z" fill="#D4A843"/>
+        <path d="M25 19 L25 27.5 L27.5 23.5 Z" fill="#D4A843"/>
+      </svg>
+      <div>
+        <div style="font-size:.7rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:rgba(255,255,255,.6);">
+          Монгол Улс
+        </div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:white;font-weight:600;letter-spacing:.05em;">
+          НД Судалгааны Систем
+        </div>
+      </div>
+    </div>
+
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.2rem);
+      font-weight:700;color:white;line-height:1.15;margin-bottom:16px;max-width:600px;">
+      Таны санал бодол<br>
+      <span style="color:#D4A843;">чухал</span>
+    </h1>
+    <p style="font-size:1rem;color:rgba(255,255,255,.7);max-width:480px;line-height:1.7;">
+      Монгол Улсын иргэдийн дуу хоолойг нэгтгэх судалгааны систем.
+      Доорх судалгаануудад оролцоно уу.
+    </p>
+
+    <!-- Stats -->
+    <div style="display:flex;gap:32px;margin-top:36px;flex-wrap:wrap;">
+      <div style="text-align:center;">
+        <div style="font-family:'Playfair Display',serif;font-size:2rem;color:white;line-height:1;">{{ surveys|length }}</div>
+        <div style="font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-top:4px;">Судалгаа</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Survey cards -->
+<div class="page wide" style="padding-top:40px;">
+  {% if surveys %}
+  <div style="margin-bottom:24px;">
+    <div style="font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);margin-bottom:6px;">
+      Идэвхтэй судалгаанууд
+    </div>
+    <div style="height:3px;width:40px;background:linear-gradient(90deg,var(--blue),var(--red));border-radius:2px;"></div>
   </div>
 
-  <div class="divider"></div>
-
-  {% if surveys %}
-  <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:2px; margin-top:24px;">
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
     {% for survey in surveys %}
-    <a href="/survey/{{ survey.id }}" style="text-decoration:none; display:block; group;">
-      <div style="background:var(--bg2); border:1px solid var(--border); padding:32px; cursor:pointer; transition:border-color .2s; position:relative; overflow:hidden;"
-        onmouseenter="this.style.borderColor='#c9a96e'" onmouseleave="this.style.borderColor='var(--border)'">
-        <div style="font-size:.65rem; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); margin-bottom:16px;">
+    <a href="/survey/{{ survey.id }}" style="text-decoration:none;display:block;">
+      <div class="card-3d" style="padding:28px;cursor:pointer;height:100%;">
+        <!-- Mongolia mini-map watermark -->
+        <svg viewBox="0 0 300 130" style="position:absolute;right:10px;bottom:10px;width:120px;height:auto;opacity:.05;pointer-events:none;" fill="var(--blue)">
+          <path d="M 30,50 L 40,42 L 52,38 L 64,34 L 76,28 L 90,26 L 104,22 L 118,18 L 132,16 L 146,14 L 160,12 L 174,10 L 188,9 L 202,10 L 216,12 L 228,16 L 238,22 L 244,30 L 240,40 L 236,50 L 238,60 L 234,68 L 226,74 L 214,78 L 200,80 L 186,82 L 172,84 L 158,86 L 144,87 L 130,86 L 116,84 L 102,82 L 88,78 L 74,72 L 60,66 L 44,58 Z"/>
+        </svg>
+
+        <div style="font-size:.65rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+          color:var(--blue);margin-bottom:14px;">
           {{ survey.created_at.strftime('%Y · %m · %d') }}
         </div>
-        <div style="font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:400; color:var(--text); line-height:1.3; margin-bottom:10px;">
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:600;
+          color:var(--text);line-height:1.3;margin-bottom:10px;">
           {{ survey.title }}
-        </div>
+        </h3>
         {% if survey.description %}
-        <div style="font-size:.82rem; color:var(--muted); line-height:1.6; margin-bottom:20px;">
-          {{ survey.description[:100] }}{% if survey.description|length > 100 %}…{% endif %}
-        </div>
+        <p style="font-size:.83rem;color:var(--muted);line-height:1.65;margin-bottom:20px;">
+          {{ survey.description[:90] }}{% if survey.description|length > 90 %}…{% endif %}
+        </p>
         {% endif %}
-        <div style="display:flex; align-items:center; gap:8px; margin-top:24px;">
-          <span style="font-size:.72rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--gold);">
-            Оролцох →
-          </span>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:16px;
+          border-top:1px solid var(--border);">
+          <div style="width:28px;height:28px;border-radius:50%;
+            background:linear-gradient(135deg,var(--blue),var(--red));
+            display:flex;align-items:center;justify-content:center;">
+            <span style="color:white;font-size:.8rem;">→</span>
+          </div>
+          <span style="font-size:.75rem;font-weight:600;letter-spacing:.08em;
+            text-transform:uppercase;color:var(--blue);">Оролцох</span>
         </div>
-        <div style="position:absolute; bottom:0; right:0; width:80px; height:80px;
-          background:linear-gradient(135deg,transparent 50%,rgba(201,169,110,.05) 50%);"></div>
       </div>
     </a>
     {% endfor %}
   </div>
 
   {% else %}
-  <div style="padding: 80px 0; text-align:center; color:var(--muted);">
-    <div style="font-family:'Playfair Display',serif; font-size:1.5rem; margin-bottom:12px; color:var(--border2);">—</div>
-    <p style="font-size:.85rem; letter-spacing:.05em;">Одоогоор идэвхтэй судалгаа байхгүй байна</p>
+  <div style="text-align:center;padding:80px 24px;color:var(--muted);">
+    <div style="width:64px;height:64px;border-radius:16px;background:var(--bg2);border:2px dashed var(--border);
+      display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.5rem;">📋</div>
+    <p style="font-size:.9rem;">Одоогоор идэвхтэй судалгаа байхгүй байна</p>
   </div>
   {% endif %}
-
 </div>
 {% endblock %}

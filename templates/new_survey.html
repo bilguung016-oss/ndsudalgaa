@@ -4,28 +4,29 @@
 <a href="/admin/dashboard" class="topbar-link">← Буцах</a>
 {% endblock %}
 {% block content %}
-<div style="max-width:560px; padding-top:48px;">
-  <div class="section-eyebrow">Шинэ</div>
-  <h1 class="section-title">Судалгаа үүсгэх</h1>
-  <div class="divider"></div>
+<div style="max-width:560px;padding-top:32px;">
+  <div style="font-size:.68rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);margin-bottom:8px;">Шинэ судалгаа</div>
+  <h1 style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:600;color:var(--text);margin-bottom:32px;">Судалгаа үүсгэх</h1>
 
-  <form method="POST" style="margin-top:32px;">
-    <div style="margin-bottom:24px;">
-      <label style="font-size:.7rem; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:8px;">
-        Гарчиг <span style="color:var(--gold);">*</span>
-      </label>
-      <input type="text" name="title" class="input-box" placeholder="Судалгааны нэр" required autofocus style="font-size:1rem; padding:14px;">
-    </div>
-    <div style="margin-bottom:36px;">
-      <label style="font-size:.7rem; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:8px;">
-        Тайлбар
-      </label>
-      <textarea name="description" class="input-box" rows="3" placeholder="Судалгааны зорилго…"></textarea>
-    </div>
-    <div style="display:flex; gap:12px;">
-      <button type="submit" class="btn btn-gold">Үргэлжлүүлэх →</button>
-      <a href="/admin/dashboard" class="btn btn-ghost">Цуцлах</a>
-    </div>
-  </form>
+  <div class="card-3d">
+    <form method="POST">
+      <div style="margin-bottom:22px;">
+        <label style="font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px;">
+          Гарчиг <span style="color:var(--red);">*</span>
+        </label>
+        <input type="text" name="title" class="input-box" placeholder="Судалгааны нэр" required autofocus style="font-size:1rem;padding:13px 16px;">
+      </div>
+      <div style="margin-bottom:32px;">
+        <label style="font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px;">
+          Тайлбар
+        </label>
+        <textarea name="description" class="input-box" rows="3" placeholder="Судалгааны зорилго, товч тайлбар…"></textarea>
+      </div>
+      <div style="display:flex;gap:12px;">
+        <button type="submit" class="btn btn-primary">Үргэлжлүүлэх →</button>
+        <a href="/admin/dashboard" class="btn btn-ghost">Цуцлах</a>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}
