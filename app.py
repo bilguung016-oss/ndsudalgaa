@@ -288,6 +288,19 @@ def survey_results(survey_id):
 
 with app.app_context():
     db.create_all()
+    # Migration: add new columns if they don't exist
+    with db.engine.connect() as conn:
+        from sqlalchemy import text
+        try:
+            conn.execute(text("ALTER TABLE question ADD COLUMN parent_question_id INTEGER REFERENCES question(id)"))
+            conn.commit()
+        except Exception:
+            conn.rollback()
+        try:
+            conn.execute(text("ALTER TABLE question ADD COLUMN trigger_value VARCHAR(500)"))
+            conn.commit()
+        except Exception:
+            conn.rollback()
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
